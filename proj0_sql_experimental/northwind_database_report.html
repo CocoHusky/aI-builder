@@ -1,0 +1,2142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Northwind Database Structure Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .table-section {
+            margin-bottom: 50px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header:hover {
+            background: #5568d3;
+        }
+        
+        .table-content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .table-content.active {
+            display: block;
+        }
+        
+        .table-info {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .table-info p {
+            margin: 5px 0;
+        }
+        
+        .binary-data {
+            color: #999;
+            font-style: italic;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+        
+        .toggle-icon.active {
+            transform: rotate(180deg);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            background: #f8f9fa;
+        }
+        
+        /* Schema Block Visualization Styles */
+        .schema-blocks {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .table-block {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .table-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .table-block-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-block-header h3 {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .row-count {
+            font-size: 0.9em;
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        
+        .table-block-body {
+            padding: 15px;
+        }
+        
+        .column-group {
+            margin-bottom: 15px;
+        }
+        
+        .column-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .group-label {
+            font-weight: 600;
+            font-size: 0.85em;
+            color: #667eea;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .column-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            border-left: 3px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        
+        .pk-item {
+            border-left-color: #28a745;
+            background: #f0f9f4;
+        }
+        
+        .fk-item {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+        
+        .regular-item {
+            border-left-color: #6c757d;
+        }
+        
+        .col-name {
+            font-weight: 500;
+            color: #333;
+            flex: 1;
+        }
+        
+        .col-type {
+            color: #666;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+        
+        .col-ref {
+            color: #667eea;
+            font-size: 0.8em;
+            font-style: italic;
+            margin-left: 10px;
+        }
+        
+        /* Mermaid Diagram Styles */
+        .mermaid-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        .mermaid {
+            text-align: center;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ Northwind Database Structure</h1>
+            <p>Generated on January 05, 2026 at 04:27 PM</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>📐 Database Schema Visualization</h2>
+                <div class="mermaid-container">
+                    <pre class="mermaid">
+erDiagram
+    Categories {
+        INTEGER CategoryID PK
+        TEXT CategoryName
+        TEXT Description
+        BLOB Picture
+    }
+    CustomerCustomerDemo {
+        TEXT CustomerID PK
+        TEXT CustomerTypeID PK
+    }
+    CustomerDemographics {
+        TEXT CustomerTypeID PK
+        TEXT CustomerDesc
+    }
+    Customers {
+        TEXT CustomerID PK
+        TEXT CompanyName
+        TEXT ContactName
+        TEXT ContactTitle
+        TEXT Address
+        TEXT City
+        TEXT Region
+        TEXT PostalCode
+        TEXT Country
+        TEXT Phone
+        TEXT Fax
+    }
+    EmployeeTerritories {
+        INTEGER EmployeeID PK
+        TEXT TerritoryID PK
+    }
+    Employees {
+        INTEGER EmployeeID PK
+        TEXT LastName
+        TEXT FirstName
+        TEXT Title
+        TEXT TitleOfCourtesy
+        DATE BirthDate
+        DATE HireDate
+        TEXT Address
+        TEXT City
+        TEXT Region
+        TEXT PostalCode
+        TEXT Country
+        TEXT HomePhone
+        TEXT Extension
+        BLOB Photo
+        TEXT Notes
+        INTEGER ReportsTo
+        TEXT PhotoPath
+    }
+    Order_Details {
+        INTEGER OrderID PK
+        INTEGER ProductID PK
+        NUMERIC UnitPrice NOT NULL
+        INTEGER Quantity NOT NULL
+        REAL Discount NOT NULL
+    }
+    Orders {
+        INTEGER OrderID PK
+        TEXT CustomerID
+        INTEGER EmployeeID
+        DATETIME OrderDate
+        DATETIME RequiredDate
+        DATETIME ShippedDate
+        INTEGER ShipVia
+        NUMERIC Freight
+        TEXT ShipName
+        TEXT ShipAddress
+        TEXT ShipCity
+        TEXT ShipRegion
+        TEXT ShipPostalCode
+        TEXT ShipCountry
+    }
+    Products {
+        INTEGER ProductID PK
+        TEXT ProductName NOT NULL
+        INTEGER SupplierID
+        INTEGER CategoryID
+        TEXT QuantityPerUnit
+        NUMERIC UnitPrice
+        INTEGER UnitsInStock
+        INTEGER UnitsOnOrder
+        INTEGER ReorderLevel
+        TEXT Discontinued NOT NULL
+    }
+    Regions {
+        INTEGER RegionID PK
+        TEXT RegionDescription NOT NULL
+    }
+    Shippers {
+        INTEGER ShipperID PK
+        TEXT CompanyName NOT NULL
+        TEXT Phone
+    }
+    Suppliers {
+        INTEGER SupplierID PK
+        TEXT CompanyName NOT NULL
+        TEXT ContactName
+        TEXT ContactTitle
+        TEXT Address
+        TEXT City
+        TEXT Region
+        TEXT PostalCode
+        TEXT Country
+        TEXT Phone
+        TEXT Fax
+        TEXT HomePage
+    }
+    Territories {
+        TEXT TerritoryID PK
+        TEXT TerritoryDescription NOT NULL
+        INTEGER RegionID NOT NULL
+    }
+    sqlite_sequence {
+         name
+         seq
+    }
+    CustomerCustomerDemo ||--o{ CustomerDemographics : "has"
+    CustomerCustomerDemo ||--o{ Customers : "has"
+    EmployeeTerritories ||--o{ Territories : "has"
+    EmployeeTerritories ||--o{ Employees : "has"
+    Employees ||--o{ Employees : "has"
+    Order_Details ||--o{ Products : "has"
+    Order_Details ||--o{ Orders : "has"
+    Orders ||--o{ Shippers : "has"
+    Orders ||--o{ Customers : "has"
+    Orders ||--o{ Employees : "has"
+    Products ||--o{ Suppliers : "has"
+    Products ||--o{ Categories : "has"
+    Territories ||--o{ Regions : "has"
+                    </pre>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🧱 Table Structure Blocks</h2>
+                <div class="schema-blocks">
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Categories</h3>
+                <span class="row-count">8 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">CategoryID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">CategoryName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Description</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Picture</span>
+                    <span class="col-type">BLOB</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>CustomerCustomerDemo</h3>
+                <span class="row-count">0 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">CustomerID</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item pk-item">
+                    <span class="col-name">CustomerTypeID</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>CustomerDemographics</h3>
+                <span class="row-count">0 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">CustomerTypeID</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">CustomerDesc</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Customers</h3>
+                <span class="row-count">93 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">CustomerID</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">CompanyName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ContactName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ContactTitle</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Address</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">City</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Region</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">PostalCode</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Country</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Phone</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Fax</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>EmployeeTerritories</h3>
+                <span class="row-count">49 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">EmployeeID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                
+                <div class="column-item pk-item">
+                    <span class="col-name">TerritoryID</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Employees</h3>
+                <span class="row-count">9 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">EmployeeID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                </div><div class="column-group fk-group"><div class="group-label">🔗 Foreign Keys</div>
+                <div class="column-item fk-item">
+                    <span class="col-name">ReportsTo</span>
+                    <span class="col-type">INTEGER</span>
+                    <span class="col-ref"> → Employees.EmployeeID</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">LastName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">FirstName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Title</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">TitleOfCourtesy</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">BirthDate</span>
+                    <span class="col-type">DATE</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">HireDate</span>
+                    <span class="col-type">DATE</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Address</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">City</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Region</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">PostalCode</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Country</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">HomePhone</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Extension</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Photo</span>
+                    <span class="col-type">BLOB</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Notes</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">PhotoPath</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Order Details</h3>
+                <span class="row-count">609,283 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">OrderID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                
+                <div class="column-item pk-item">
+                    <span class="col-name">ProductID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">UnitPrice</span>
+                    <span class="col-type">NUMERIC</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Quantity</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Discount</span>
+                    <span class="col-type">REAL</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Orders</h3>
+                <span class="row-count">16,282 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">OrderID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                </div><div class="column-group fk-group"><div class="group-label">🔗 Foreign Keys</div>
+                <div class="column-item fk-item">
+                    <span class="col-name">CustomerID</span>
+                    <span class="col-type">TEXT</span>
+                    <span class="col-ref"> → Customers.CustomerID</span>
+                </div>
+                
+                <div class="column-item fk-item">
+                    <span class="col-name">EmployeeID</span>
+                    <span class="col-type">INTEGER</span>
+                    <span class="col-ref"> → Employees.EmployeeID</span>
+                </div>
+                
+                <div class="column-item fk-item">
+                    <span class="col-name">ShipVia</span>
+                    <span class="col-type">INTEGER</span>
+                    <span class="col-ref"> → Shippers.ShipperID</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">OrderDate</span>
+                    <span class="col-type">DATETIME</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">RequiredDate</span>
+                    <span class="col-type">DATETIME</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ShippedDate</span>
+                    <span class="col-type">DATETIME</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Freight</span>
+                    <span class="col-type">NUMERIC</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ShipName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ShipAddress</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ShipCity</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ShipRegion</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ShipPostalCode</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ShipCountry</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Products</h3>
+                <span class="row-count">77 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">ProductID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                </div><div class="column-group fk-group"><div class="group-label">🔗 Foreign Keys</div>
+                <div class="column-item fk-item">
+                    <span class="col-name">SupplierID</span>
+                    <span class="col-type">INTEGER</span>
+                    <span class="col-ref"> → Suppliers.SupplierID</span>
+                </div>
+                
+                <div class="column-item fk-item">
+                    <span class="col-name">CategoryID</span>
+                    <span class="col-type">INTEGER</span>
+                    <span class="col-ref"> → Categories.CategoryID</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">ProductName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">QuantityPerUnit</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">UnitPrice</span>
+                    <span class="col-type">NUMERIC</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">UnitsInStock</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">UnitsOnOrder</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ReorderLevel</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Discontinued</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Regions</h3>
+                <span class="row-count">4 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">RegionID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">RegionDescription</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Shippers</h3>
+                <span class="row-count">3 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">ShipperID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">CompanyName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Phone</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Suppliers</h3>
+                <span class="row-count">29 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">SupplierID</span>
+                    <span class="col-type">INTEGER</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">CompanyName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ContactName</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">ContactTitle</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Address</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">City</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Region</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">PostalCode</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Country</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Phone</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">Fax</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">HomePage</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>Territories</h3>
+                <span class="row-count">53 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group pk-group"><div class="group-label">🔑 Primary Keys</div>
+                <div class="column-item pk-item">
+                    <span class="col-name">TerritoryID</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div><div class="column-group fk-group"><div class="group-label">🔗 Foreign Keys</div>
+                <div class="column-item fk-item">
+                    <span class="col-name">RegionID</span>
+                    <span class="col-type">INTEGER</span>
+                    <span class="col-ref"> → Regions.RegionID</span>
+                </div>
+                </div><div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">TerritoryDescription</span>
+                    <span class="col-type">TEXT</span>
+                </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-block">
+            <div class="table-block-header">
+                <h3>sqlite_sequence</h3>
+                <span class="row-count">6 rows</span>
+            </div>
+            <div class="table-block-body">
+        <div class="column-group regular-group"><div class="group-label">📋 Columns</div>
+                <div class="column-item regular-item">
+                    <span class="col-name">name</span>
+                    <span class="col-type"></span>
+                </div>
+                
+                <div class="column-item regular-item">
+                    <span class="col-name">seq</span>
+                    <span class="col-type"></span>
+                </div>
+                </div>
+            </div>
+        </div>
+        </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>14</h3>
+                    <p>Total Tables</p>
+                </div>
+                <div class="stat-card">
+                    <h3>625,896</h3>
+                    <p>Total Rows</p>
+                </div>
+                <div class="stat-card">
+                    <h3>90</h3>
+                    <p>Total Columns</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📊 Database Overview</h2>
+                <table border="1" class="dataframe summary-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Table</th>
+      <th>Rows</th>
+      <th>Columns</th>
+      <th>Column_Names</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Categories</td>
+      <td>8</td>
+      <td>4</td>
+      <td>CategoryID, CategoryName, Description, Picture</td>
+    </tr>
+    <tr>
+      <td>CustomerCustomerDemo</td>
+      <td>0</td>
+      <td>2</td>
+      <td>CustomerID, CustomerTypeID</td>
+    </tr>
+    <tr>
+      <td>CustomerDemographics</td>
+      <td>0</td>
+      <td>2</td>
+      <td>CustomerTypeID, CustomerDesc</td>
+    </tr>
+    <tr>
+      <td>Customers</td>
+      <td>93</td>
+      <td>11</td>
+      <td>CustomerID, CompanyName, ContactName, ContactTitle, Address, City, Region, PostalCode, Country, Phone, Fax</td>
+    </tr>
+    <tr>
+      <td>EmployeeTerritories</td>
+      <td>49</td>
+      <td>2</td>
+      <td>EmployeeID, TerritoryID</td>
+    </tr>
+    <tr>
+      <td>Employees</td>
+      <td>9</td>
+      <td>18</td>
+      <td>EmployeeID, LastName, FirstName, Title, TitleOfCourtesy, BirthDate, HireDate, Address, City, Region, PostalCode, Country, HomePhone, Extension, Photo, Notes, ReportsTo, PhotoPath</td>
+    </tr>
+    <tr>
+      <td>Order Details</td>
+      <td>609283</td>
+      <td>5</td>
+      <td>OrderID, ProductID, UnitPrice, Quantity, Discount</td>
+    </tr>
+    <tr>
+      <td>Orders</td>
+      <td>16282</td>
+      <td>14</td>
+      <td>OrderID, CustomerID, EmployeeID, OrderDate, RequiredDate, ShippedDate, ShipVia, Freight, ShipName, ShipAddress, ShipCity, ShipRegion, ShipPostalCode, ShipCountry</td>
+    </tr>
+    <tr>
+      <td>Products</td>
+      <td>77</td>
+      <td>10</td>
+      <td>ProductID, ProductName, SupplierID, CategoryID, QuantityPerUnit, UnitPrice, UnitsInStock, UnitsOnOrder, ReorderLevel, Discontinued</td>
+    </tr>
+    <tr>
+      <td>Regions</td>
+      <td>4</td>
+      <td>2</td>
+      <td>RegionID, RegionDescription</td>
+    </tr>
+    <tr>
+      <td>Shippers</td>
+      <td>3</td>
+      <td>3</td>
+      <td>ShipperID, CompanyName, Phone</td>
+    </tr>
+    <tr>
+      <td>Suppliers</td>
+      <td>29</td>
+      <td>12</td>
+      <td>SupplierID, CompanyName, ContactName, ContactTitle, Address, City, Region, PostalCode, Country, Phone, Fax, HomePage</td>
+    </tr>
+    <tr>
+      <td>Territories</td>
+      <td>53</td>
+      <td>3</td>
+      <td>TerritoryID, TerritoryDescription, RegionID</td>
+    </tr>
+    <tr>
+      <td>sqlite_sequence</td>
+      <td>6</td>
+      <td>2</td>
+      <td>name, seq</td>
+    </tr>
+  </tbody>
+</table>
+            </div>
+            
+            <div class="section">
+                <h2>📋 Table Details & Sample Data</h2>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(0)">
+                        <span>📑 Categories</span>
+                        <span class="toggle-icon" id="icon-0">▼</span>
+                    </div>
+                    <div class="table-content" id="content-0">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 8</p>
+                            <p><strong>Columns:</strong> 4</p>
+                            <p><strong>Column Names:</strong> CategoryID, CategoryName, Description, Picture</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>CategoryID</th>
+      <th>CategoryName</th>
+      <th>Description</th>
+      <th>Picture</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Beverages</td>
+      <td>Soft drinks, coffees, teas, beers, and ales</td>
+      <td><span class="binary-data">BINARY DATA (10151 bytes)</span></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Condiments</td>
+      <td>Sweet and savory sauces, relishes, spreads, and seasonings</td>
+      <td><span class="binary-data">BINARY DATA (12107 bytes)</span></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Confections</td>
+      <td>Desserts, candies, and sweet breads</td>
+      <td><span class="binary-data">BINARY DATA (12007 bytes)</span></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Dairy Products</td>
+      <td>Cheeses</td>
+      <td><span class="binary-data">BINARY DATA (9756 bytes)</span></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Grains/Cereals</td>
+      <td>Breads, crackers, pasta, and cereal</td>
+      <td><span class="binary-data">BINARY DATA (12131 bytes)</span></td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(1)">
+                        <span>📑 CustomerCustomerDemo</span>
+                        <span class="toggle-icon" id="icon-1">▼</span>
+                    </div>
+                    <div class="table-content" id="content-1">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 0</p>
+                            <p><strong>Columns:</strong> 2</p>
+                            <p><strong>Column Names:</strong> CustomerID, CustomerTypeID</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>CustomerID</th>
+      <th>CustomerTypeID</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(2)">
+                        <span>📑 CustomerDemographics</span>
+                        <span class="toggle-icon" id="icon-2">▼</span>
+                    </div>
+                    <div class="table-content" id="content-2">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 0</p>
+                            <p><strong>Columns:</strong> 2</p>
+                            <p><strong>Column Names:</strong> CustomerTypeID, CustomerDesc</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>CustomerTypeID</th>
+      <th>CustomerDesc</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(3)">
+                        <span>📑 Customers</span>
+                        <span class="toggle-icon" id="icon-3">▼</span>
+                    </div>
+                    <div class="table-content" id="content-3">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 93</p>
+                            <p><strong>Columns:</strong> 11</p>
+                            <p><strong>Column Names:</strong> CustomerID, CompanyName, ContactName, ContactTitle, Address, City, Region, PostalCode, Country, Phone, Fax</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>CustomerID</th>
+      <th>CompanyName</th>
+      <th>ContactName</th>
+      <th>ContactTitle</th>
+      <th>Address</th>
+      <th>City</th>
+      <th>Region</th>
+      <th>PostalCode</th>
+      <th>Country</th>
+      <th>Phone</th>
+      <th>Fax</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ALFKI</td>
+      <td>Alfreds Futterkiste</td>
+      <td>Maria Anders</td>
+      <td>Sales Representative</td>
+      <td>Obere Str. 57</td>
+      <td>Berlin</td>
+      <td>Western Europe</td>
+      <td>12209</td>
+      <td>Germany</td>
+      <td>030-0074321</td>
+      <td>030-0076545</td>
+    </tr>
+    <tr>
+      <td>ANATR</td>
+      <td>Ana Trujillo Emparedados y helados</td>
+      <td>Ana Trujillo</td>
+      <td>Owner</td>
+      <td>Avda. de la Constitución 2222</td>
+      <td>México D.F.</td>
+      <td>Central America</td>
+      <td>05021</td>
+      <td>Mexico</td>
+      <td>(5) 555-4729</td>
+      <td>(5) 555-3745</td>
+    </tr>
+    <tr>
+      <td>ANTON</td>
+      <td>Antonio Moreno Taquería</td>
+      <td>Antonio Moreno</td>
+      <td>Owner</td>
+      <td>Mataderos  2312</td>
+      <td>México D.F.</td>
+      <td>Central America</td>
+      <td>05023</td>
+      <td>Mexico</td>
+      <td>(5) 555-3932</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td>AROUT</td>
+      <td>Around the Horn</td>
+      <td>Thomas Hardy</td>
+      <td>Sales Representative</td>
+      <td>120 Hanover Sq.</td>
+      <td>London</td>
+      <td>British Isles</td>
+      <td>WA1 1DP</td>
+      <td>UK</td>
+      <td>(171) 555-7788</td>
+      <td>(171) 555-6750</td>
+    </tr>
+    <tr>
+      <td>BERGS</td>
+      <td>Berglunds snabbköp</td>
+      <td>Christina Berglund</td>
+      <td>Order Administrator</td>
+      <td>Berguvsvägen  8</td>
+      <td>Luleå</td>
+      <td>Northern Europe</td>
+      <td>S-958 22</td>
+      <td>Sweden</td>
+      <td>0921-12 34 65</td>
+      <td>0921-12 34 67</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(4)">
+                        <span>📑 EmployeeTerritories</span>
+                        <span class="toggle-icon" id="icon-4">▼</span>
+                    </div>
+                    <div class="table-content" id="content-4">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 49</p>
+                            <p><strong>Columns:</strong> 2</p>
+                            <p><strong>Column Names:</strong> EmployeeID, TerritoryID</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>EmployeeID</th>
+      <th>TerritoryID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>06897</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>19713</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>01581</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>01730</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>01833</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(5)">
+                        <span>📑 Employees</span>
+                        <span class="toggle-icon" id="icon-5">▼</span>
+                    </div>
+                    <div class="table-content" id="content-5">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 9</p>
+                            <p><strong>Columns:</strong> 18</p>
+                            <p><strong>Column Names:</strong> EmployeeID, LastName, FirstName, Title, TitleOfCourtesy, BirthDate, HireDate, Address, City, Region, PostalCode, Country, HomePhone, Extension, Photo, Notes, ReportsTo, PhotoPath</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>EmployeeID</th>
+      <th>LastName</th>
+      <th>FirstName</th>
+      <th>Title</th>
+      <th>TitleOfCourtesy</th>
+      <th>BirthDate</th>
+      <th>HireDate</th>
+      <th>Address</th>
+      <th>City</th>
+      <th>Region</th>
+      <th>PostalCode</th>
+      <th>Country</th>
+      <th>HomePhone</th>
+      <th>Extension</th>
+      <th>Photo</th>
+      <th>Notes</th>
+      <th>ReportsTo</th>
+      <th>PhotoPath</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Davolio</td>
+      <td>Nancy</td>
+      <td>Sales Representative</td>
+      <td>Ms.</td>
+      <td>1968-12-08</td>
+      <td>2012-05-01</td>
+      <td>507 - 20th Ave. E.Apt. 2A</td>
+      <td>Seattle</td>
+      <td>North America</td>
+      <td>98122</td>
+      <td>USA</td>
+      <td>(206) 555-9857</td>
+      <td>5467</td>
+      <td><span class="binary-data">BINARY DATA (12315 bytes)</span></td>
+      <td>Education includes a BA in psychology from Colorado State University in 1970.  She also completed "T...</td>
+      <td>2.0</td>
+      <td>http://accweb/emmployees/davolio.bmp</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Fuller</td>
+      <td>Andrew</td>
+      <td>Vice President, Sales</td>
+      <td>Dr.</td>
+      <td>1972-02-19</td>
+      <td>2012-08-14</td>
+      <td>908 W. Capital Way</td>
+      <td>Tacoma</td>
+      <td>North America</td>
+      <td>98401</td>
+      <td>USA</td>
+      <td>(206) 555-9482</td>
+      <td>3457</td>
+      <td><span class="binary-data">BINARY DATA (12295 bytes)</span></td>
+      <td>Andrew received his BTS commercial in 1974 and a Ph.D. in international marketing from the Universit...</td>
+      <td>NaN</td>
+      <td>http://accweb/emmployees/fuller.bmp</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Leverling</td>
+      <td>Janet</td>
+      <td>Sales Representative</td>
+      <td>Ms.</td>
+      <td>1983-08-30</td>
+      <td>2012-04-01</td>
+      <td>722 Moss Bay Blvd.</td>
+      <td>Kirkland</td>
+      <td>North America</td>
+      <td>98033</td>
+      <td>USA</td>
+      <td>(206) 555-3412</td>
+      <td>3355</td>
+      <td><span class="binary-data">BINARY DATA (11327 bytes)</span></td>
+      <td>Janet has a BS degree in chemistry from Boston College (1984).  She has also completed a certificate...</td>
+      <td>2.0</td>
+      <td>http://accweb/emmployees/leverling.bmp</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Peacock</td>
+      <td>Margaret</td>
+      <td>Sales Representative</td>
+      <td>Mrs.</td>
+      <td>1957-09-19</td>
+      <td>2013-05-03</td>
+      <td>4110 Old Redmond Rd.</td>
+      <td>Redmond</td>
+      <td>North America</td>
+      <td>98052</td>
+      <td>USA</td>
+      <td>(206) 555-8122</td>
+      <td>5176</td>
+      <td><span class="binary-data">BINARY DATA (12121 bytes)</span></td>
+      <td>Margaret holds a BA in English literature from Concordia College (1958) and an MA from the American ...</td>
+      <td>2.0</td>
+      <td>http://accweb/emmployees/peacock.bmp</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Buchanan</td>
+      <td>Steven</td>
+      <td>Sales Manager</td>
+      <td>Mr.</td>
+      <td>1975-03-04</td>
+      <td>2013-10-17</td>
+      <td>14 Garrett Hill</td>
+      <td>London</td>
+      <td>British Isles</td>
+      <td>SW1 8JR</td>
+      <td>UK</td>
+      <td>(71) 555-4848</td>
+      <td>3453</td>
+      <td><span class="binary-data">BINARY DATA (12163 bytes)</span></td>
+      <td>Steven Buchanan graduated from St. Andrews University, Scotland, with a BSC degree in 1976.  Upon jo...</td>
+      <td>2.0</td>
+      <td>http://accweb/emmployees/buchanan.bmp</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(6)">
+                        <span>📑 Order Details</span>
+                        <span class="toggle-icon" id="icon-6">▼</span>
+                    </div>
+                    <div class="table-content" id="content-6">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 609,283</p>
+                            <p><strong>Columns:</strong> 5</p>
+                            <p><strong>Column Names:</strong> OrderID, ProductID, UnitPrice, Quantity, Discount</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>OrderID</th>
+      <th>ProductID</th>
+      <th>UnitPrice</th>
+      <th>Quantity</th>
+      <th>Discount</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>10248</td>
+      <td>11</td>
+      <td>14.0</td>
+      <td>12</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>10248</td>
+      <td>42</td>
+      <td>9.8</td>
+      <td>10</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>10248</td>
+      <td>72</td>
+      <td>34.8</td>
+      <td>5</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>10249</td>
+      <td>14</td>
+      <td>18.6</td>
+      <td>9</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>10249</td>
+      <td>51</td>
+      <td>42.4</td>
+      <td>40</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(7)">
+                        <span>📑 Orders</span>
+                        <span class="toggle-icon" id="icon-7">▼</span>
+                    </div>
+                    <div class="table-content" id="content-7">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 16,282</p>
+                            <p><strong>Columns:</strong> 14</p>
+                            <p><strong>Column Names:</strong> OrderID, CustomerID, EmployeeID, OrderDate, RequiredDate, ShippedDate, ShipVia, Freight, ShipName, ShipAddress, ShipCity, ShipRegion, ShipPostalCode, ShipCountry</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>OrderID</th>
+      <th>CustomerID</th>
+      <th>EmployeeID</th>
+      <th>OrderDate</th>
+      <th>RequiredDate</th>
+      <th>ShippedDate</th>
+      <th>ShipVia</th>
+      <th>Freight</th>
+      <th>ShipName</th>
+      <th>ShipAddress</th>
+      <th>ShipCity</th>
+      <th>ShipRegion</th>
+      <th>ShipPostalCode</th>
+      <th>ShipCountry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>10248</td>
+      <td>VINET</td>
+      <td>5</td>
+      <td>2016-07-04</td>
+      <td>2016-08-01</td>
+      <td>2016-07-16</td>
+      <td>3</td>
+      <td>16.75</td>
+      <td>Vins et alcools Chevalier</td>
+      <td>59 rue de l-Abbaye</td>
+      <td>Reims</td>
+      <td>Western Europe</td>
+      <td>51100</td>
+      <td>France</td>
+    </tr>
+    <tr>
+      <td>10249</td>
+      <td>TOMSP</td>
+      <td>6</td>
+      <td>2016-07-05</td>
+      <td>2016-08-16</td>
+      <td>2016-07-10</td>
+      <td>1</td>
+      <td>22.25</td>
+      <td>Toms Spezialitäten</td>
+      <td>Luisenstr. 48</td>
+      <td>Münster</td>
+      <td>Western Europe</td>
+      <td>44087</td>
+      <td>Germany</td>
+    </tr>
+    <tr>
+      <td>10250</td>
+      <td>HANAR</td>
+      <td>4</td>
+      <td>2016-07-08</td>
+      <td>2016-08-05</td>
+      <td>2016-07-12</td>
+      <td>2</td>
+      <td>25.00</td>
+      <td>Hanari Carnes</td>
+      <td>Rua do Paço, 67</td>
+      <td>Rio de Janeiro</td>
+      <td>South America</td>
+      <td>05454-876</td>
+      <td>Brazil</td>
+    </tr>
+    <tr>
+      <td>10251</td>
+      <td>VICTE</td>
+      <td>3</td>
+      <td>2016-07-08</td>
+      <td>2016-08-05</td>
+      <td>2016-07-15</td>
+      <td>1</td>
+      <td>20.25</td>
+      <td>Victuailles en stock</td>
+      <td>2, rue du Commerce</td>
+      <td>Lyon</td>
+      <td>Western Europe</td>
+      <td>69004</td>
+      <td>France</td>
+    </tr>
+    <tr>
+      <td>10252</td>
+      <td>SUPRD</td>
+      <td>4</td>
+      <td>2016-07-09</td>
+      <td>2016-08-06</td>
+      <td>2016-07-11</td>
+      <td>2</td>
+      <td>36.25</td>
+      <td>Suprêmes délices</td>
+      <td>Boulevard Tirou, 255</td>
+      <td>Charleroi</td>
+      <td>Western Europe</td>
+      <td>B-6000</td>
+      <td>Belgium</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(8)">
+                        <span>📑 Products</span>
+                        <span class="toggle-icon" id="icon-8">▼</span>
+                    </div>
+                    <div class="table-content" id="content-8">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 77</p>
+                            <p><strong>Columns:</strong> 10</p>
+                            <p><strong>Column Names:</strong> ProductID, ProductName, SupplierID, CategoryID, QuantityPerUnit, UnitPrice, UnitsInStock, UnitsOnOrder, ReorderLevel, Discontinued</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>ProductID</th>
+      <th>ProductName</th>
+      <th>SupplierID</th>
+      <th>CategoryID</th>
+      <th>QuantityPerUnit</th>
+      <th>UnitPrice</th>
+      <th>UnitsInStock</th>
+      <th>UnitsOnOrder</th>
+      <th>ReorderLevel</th>
+      <th>Discontinued</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Chai</td>
+      <td>1</td>
+      <td>1</td>
+      <td>10 boxes x 20 bags</td>
+      <td>18.00</td>
+      <td>39</td>
+      <td>0</td>
+      <td>10</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Chang</td>
+      <td>1</td>
+      <td>1</td>
+      <td>24 - 12 oz bottles</td>
+      <td>19.00</td>
+      <td>17</td>
+      <td>40</td>
+      <td>25</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Aniseed Syrup</td>
+      <td>1</td>
+      <td>2</td>
+      <td>12 - 550 ml bottles</td>
+      <td>10.00</td>
+      <td>13</td>
+      <td>70</td>
+      <td>25</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Chef Anton's Cajun Seasoning</td>
+      <td>2</td>
+      <td>2</td>
+      <td>48 - 6 oz jars</td>
+      <td>22.00</td>
+      <td>53</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Chef Anton's Gumbo Mix</td>
+      <td>2</td>
+      <td>2</td>
+      <td>36 boxes</td>
+      <td>21.35</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(9)">
+                        <span>📑 Regions</span>
+                        <span class="toggle-icon" id="icon-9">▼</span>
+                    </div>
+                    <div class="table-content" id="content-9">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 4</p>
+                            <p><strong>Columns:</strong> 2</p>
+                            <p><strong>Column Names:</strong> RegionID, RegionDescription</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>RegionID</th>
+      <th>RegionDescription</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Eastern</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Western</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Northern</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Southern</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(10)">
+                        <span>📑 Shippers</span>
+                        <span class="toggle-icon" id="icon-10">▼</span>
+                    </div>
+                    <div class="table-content" id="content-10">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 3</p>
+                            <p><strong>Columns:</strong> 3</p>
+                            <p><strong>Column Names:</strong> ShipperID, CompanyName, Phone</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>ShipperID</th>
+      <th>CompanyName</th>
+      <th>Phone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Speedy Express</td>
+      <td>(503) 555-9831</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>United Package</td>
+      <td>(503) 555-3199</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Federal Shipping</td>
+      <td>(503) 555-9931</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(11)">
+                        <span>📑 Suppliers</span>
+                        <span class="toggle-icon" id="icon-11">▼</span>
+                    </div>
+                    <div class="table-content" id="content-11">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 29</p>
+                            <p><strong>Columns:</strong> 12</p>
+                            <p><strong>Column Names:</strong> SupplierID, CompanyName, ContactName, ContactTitle, Address, City, Region, PostalCode, Country, Phone, Fax, HomePage</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>SupplierID</th>
+      <th>CompanyName</th>
+      <th>ContactName</th>
+      <th>ContactTitle</th>
+      <th>Address</th>
+      <th>City</th>
+      <th>Region</th>
+      <th>PostalCode</th>
+      <th>Country</th>
+      <th>Phone</th>
+      <th>Fax</th>
+      <th>HomePage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Exotic Liquids</td>
+      <td>Charlotte Cooper</td>
+      <td>Purchasing Manager</td>
+      <td>49 Gilbert St.</td>
+      <td>London</td>
+      <td>British Isles</td>
+      <td>EC1 4SD</td>
+      <td>UK</td>
+      <td>(171) 555-2222</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>New Orleans Cajun Delights</td>
+      <td>Shelley Burke</td>
+      <td>Order Administrator</td>
+      <td>P.O. Box 78934</td>
+      <td>New Orleans</td>
+      <td>North America</td>
+      <td>70117</td>
+      <td>USA</td>
+      <td>(100) 555-4822</td>
+      <td>None</td>
+      <td>#CAJUN.HTM#</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Grandma Kelly's Homestead</td>
+      <td>Regina Murphy</td>
+      <td>Sales Representative</td>
+      <td>707 Oxford Rd.</td>
+      <td>Ann Arbor</td>
+      <td>North America</td>
+      <td>48104</td>
+      <td>USA</td>
+      <td>(313) 555-5735</td>
+      <td>(313) 555-3349</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Tokyo Traders</td>
+      <td>Yoshi Nagase</td>
+      <td>Marketing Manager</td>
+      <td>9-8 Sekimai\nMusashino-shi</td>
+      <td>Tokyo</td>
+      <td>Eastern Asia</td>
+      <td>100</td>
+      <td>Japan</td>
+      <td>(03) 3555-5011</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Cooperativa de Quesos 'Las Cabras'</td>
+      <td>Antonio del Valle Saavedra</td>
+      <td>Export Administrator</td>
+      <td>Calle del Rosal 4</td>
+      <td>Oviedo</td>
+      <td>Southern Europe</td>
+      <td>33007</td>
+      <td>Spain</td>
+      <td>(98) 598 76 54</td>
+      <td>None</td>
+      <td>None</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(12)">
+                        <span>📑 Territories</span>
+                        <span class="toggle-icon" id="icon-12">▼</span>
+                    </div>
+                    <div class="table-content" id="content-12">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 53</p>
+                            <p><strong>Columns:</strong> 3</p>
+                            <p><strong>Column Names:</strong> TerritoryID, TerritoryDescription, RegionID</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>TerritoryID</th>
+      <th>TerritoryDescription</th>
+      <th>RegionID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>01581</td>
+      <td>Westboro</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>01730</td>
+      <td>Bedford</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>01833</td>
+      <td>Georgetow</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>02116</td>
+      <td>Boston</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>02139</td>
+      <td>Cambridge</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+                <div class="table-section">
+                    <div class="table-header" onclick="toggleTable(13)">
+                        <span>📑 sqlite_sequence</span>
+                        <span class="toggle-icon" id="icon-13">▼</span>
+                    </div>
+                    <div class="table-content" id="content-13">
+                        <div class="table-info">
+                            <p><strong>Rows:</strong> 6</p>
+                            <p><strong>Columns:</strong> 2</p>
+                            <p><strong>Column Names:</strong> name, seq</p>
+                        </div>
+                        <table border="1" class="dataframe sample-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>name</th>
+      <th>seq</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Categories</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>Employees</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <td>Orders</td>
+      <td>26529</td>
+    </tr>
+    <tr>
+      <td>Products</td>
+      <td>77</td>
+    </tr>
+    <tr>
+      <td>Shippers</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Northwind Database Structure Report | Generated with Python & Pandas</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleTable(idx) {
+            const content = document.getElementById('content-' + idx);
+            const icon = document.getElementById('icon-' + idx);
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.classList.remove('active');
+            } else {
+                content.classList.add('active');
+                icon.classList.add('active');
+            }
+        }
+        
+        // Style the summary table
+        document.addEventListener('DOMContentLoaded', function() {
+            const summaryTable = document.getElementById('summary-table');
+            if (summaryTable) {
+                summaryTable.style.width = '100%';
+            }
+        });
+    </script>
+</body>
+</html>
