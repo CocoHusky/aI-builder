@@ -1,5 +1,5 @@
 {
-  "name": "simple-chat",
+  "name": "coco-chat",
   "scripts": {
     "start": "node server.js"
   },

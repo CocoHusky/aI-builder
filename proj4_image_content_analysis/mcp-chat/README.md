@@ -1,13 +1,13 @@
-# AI Chat
+# Coco Chat 🐕
 
-A simple ChatGPT-like interface for chatting with AI models via the AI Builder API.
+A paw-some ChatGPT-like interface for chatting with AI models via the AI Builder API. Woof woof! 🐶
 
 ## Features
 
-- **ChatGPT-like interface** - Dark theme with sidebar and chat area
-- **Conversation management** - Save, load, and delete conversations
-- **Model selection** - Choose from available AI models
-- **Individual conversations** - Each chat is completely separate
+- **🐕 Coco Chat interface** - Dog-themed design with sidebar and chat area
+- **🐾 Paw-some conversations** - Save, load, and delete conversations
+- **🦴 Model selection** - Choose from available AI models
+- **🏡 Individual conversations** - Each chat is completely isolated like good dogs
 
 ## Quick Start
 
@@ -26,7 +26,7 @@ A simple ChatGPT-like interface for chatting with AI models via the AI Builder A
    npm start
    ```
 
-4. Open http://localhost:3001 in your browser
+4. Open http://localhost:3001 in your browser and start chatting with your furry AI friend! 🐶
 
 ## Usage
 

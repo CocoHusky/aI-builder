@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat</title>
+    <title>Coco Chat 🐕</title>
     <style>
         :root {
-            --bg-primary: #343541;
-            --bg-secondary: #40414f;
-            --bg-tertiary: #202123;
-            --text-primary: #ececf1;
-            --text-secondary: #c5c5d2;
-            --accent: #10a37f;
-            --border: #565869;
-            --user-bg: #343541;
-            --assistant-bg: #444654;
+            --bg-primary: #2d4a3e;  /* Dark forest green - dog park theme */
+            --bg-secondary: #3a5f4a; /* Medium forest green */
+            --bg-tertiary: #1e3529;  /* Darker forest green */
+            --text-primary: #f8f9fa; /* Light cream */
+            --text-secondary: #d4edda; /* Light green */
+            --accent: #ffc107; /* Golden yellow - like dog fur */
+            --border: #6c757d; /* Medium gray */
+            --user-bg: #2d4a3e; /* Same as primary */
+            --assistant-bg: #495057; /* Dark gray with green tint */
         }
 
         * {
@@ -73,6 +73,33 @@
             color: var(--text-primary);
             border: 1px solid var(--border);
             border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .model-selector select option {
+            padding: 4px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .model-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .model-current {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .model-capabilities {
+            font-size: 12px;
+            color: var(--text-secondary);
+            opacity: 0.9;
         }
 
         .chat-list {
@@ -98,6 +125,19 @@
             background: var(--bg-tertiary);
             border: 2px solid var(--accent);
             border-radius: 8px;
+        }
+
+        /* Disabled state during loading */
+        .sidebar.loading .chat-item {
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .sidebar.loading .new-chat-btn {
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
         }
 
         .chat-title {
@@ -221,11 +261,82 @@
         }
 
         .input-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .image-preview {
+            margin-bottom: 12px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .remove-image-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .input-with-attachments {
             display: flex;
             gap: 12px;
             align-items: flex-end;
-            max-width: 800px;
-            margin: 0 auto;
+        }
+
+        .input-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .attach-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .attach-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent);
         }
 
         .input-container textarea {
@@ -335,6 +446,68 @@
             background: rgba(239, 68, 68, 0.15);
             color: #ef4444;
         }
+
+        /* Message Images */
+        .message-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease;
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
+        }
+
+        .generated-image {
+            border: 2px solid var(--accent);
+        }
+
+        .message-text {
+            margin-top: 8px;
+        }
+
+        /* Image Modal */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .image-modal .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -357,9 +530,9 @@
         <!-- Main Chat Area -->
         <div class="main-chat">
             <div class="welcome" id="welcome">
-                <h1>AI Chat</h1>
-                <p>Start a new conversation with AI</p>
-                <button class="new-chat-btn" onclick="createNewChat()">Start Chat</button>
+                <h1>Coco Chat 🐕</h1>
+                <p>🐾 Woof woof! Ready to chat with your furry AI friend? 🐶</p>
+                <button class="new-chat-btn" onclick="createNewChat()">🐕 Start Chatting</button>
             </div>
 
             <div class="messages" id="messages" style="display: none;">
@@ -368,16 +541,39 @@
 
             <div class="input-area" id="inputArea" style="display: none;">
                 <div class="model-info-bar">
-                    <span>Using: <span id="modelInfo">Grok-4-Fast</span></span>
+                    <div class="model-current">
+                        <strong id="modelInfo">Grok-4-Fast</strong>
+                    </div>
+                    <div class="model-capabilities" id="modelCapabilities">
+                        💬 Text Chat
+                    </div>
                 </div>
+
+                <!-- Image preview area -->
+                <div class="image-preview" id="imagePreview" style="display: none;">
+                    <div class="image-container">
+                        <img id="previewImage" src="" alt="Preview">
+                        <button class="remove-image-btn" onclick="removeImage()" title="Remove image">×</button>
+                    </div>
+                </div>
+
                 <div class="input-container">
+                    <div class="input-with-attachments">
                     <textarea
                         id="messageInput"
-                        placeholder="Type your message..."
+                            placeholder="🐕 Woof! What's on your mind, human? 🐶"
                         rows="1"
                         onkeydown="handleKeyPress(event)"
+                            onpaste="handlePaste(event)"
                     ></textarea>
+                        <div class="input-buttons">
+                            <button class="attach-btn" onclick="triggerFileInput()" title="Attach image">
+                                📎
+                            </button>
+                            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
                     <button class="send-btn" onclick="sendMessage()" id="sendBtn">Send</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -394,19 +590,15 @@
         function createNewChat() {
             // Prevent creating new conversations while a message is being sent
             if (isLoading) {
-                hideTypingIndicator();
-                isLoading = false;
-                const sendBtn = document.getElementById('sendBtn');
-                sendBtn.disabled = false;
-                sendBtn.textContent = 'Send';
-                // Don't return - allow creating but reset the loading state
+                alert('🐶 Woof! Please wait for Coco to finish responding before creating a new conversation! 🐕');
+                return;
             }
 
             activeChat = {
                 id: Date.now().toString(),
                 title: 'New Chat',
                 messages: [],
-                model: currentModel,
+                model: currentModel, // currentModel should always be the raw ID
                 timestamp: new Date().toISOString()
             };
 
@@ -451,7 +643,34 @@
 
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'message-content';
-                contentDiv.textContent = message.content;
+
+                // Add image if present
+                if (message.image) {
+                    const img = document.createElement('img');
+                    img.src = `data:${message.image.mimeType};base64,${message.image.data}`;
+                    img.className = 'message-image';
+                    img.alt = message.image.filename || 'Uploaded image';
+                    img.onclick = () => showFullImage(img.src);
+                    contentDiv.appendChild(img);
+                }
+
+                // Add text content
+                if (message.content) {
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'message-text';
+                    textDiv.textContent = message.content;
+                    contentDiv.appendChild(textDiv);
+                }
+
+                // Handle AI-generated images (URLs in response)
+                if (message.role === 'assistant' && message.content && message.content.includes('data:image')) {
+                    const img = document.createElement('img');
+                    img.src = message.content;
+                    img.className = 'message-image generated-image';
+                    img.alt = 'Generated image';
+                    img.onclick = () => showFullImage(img.src);
+                    contentDiv.appendChild(img);
+                }
 
                 messageDiv.appendChild(contentDiv);
                 messagesDiv.appendChild(messageDiv);
@@ -473,10 +692,26 @@
             const targetChat = activeChat;
             const conversationId = targetChat.id;
 
-            const userMessage = { role: 'user', content: input.value.trim() };
+            const messageContent = input.value.trim();
+            const userMessage = {
+                role: 'user',
+                content: messageContent
+            };
+
+            // Only add image data if we actually have an image
+            if (currentImage && currentImage.base64) {
+                userMessage.image = {
+                    data: currentImage.base64,
+                    mimeType: currentImage.file.type,
+                    filename: currentImage.file.name
+                };
+            }
+
             targetChat.messages.push(userMessage);
             input.value = '';
+            removeImage(); // Clear the image after sending
             isLoading = true;
+            updateLoadingState();
             sendBtn.disabled = true;
             sendBtn.textContent = '...';
 
@@ -540,6 +775,7 @@
                 }
             } finally {
                 isLoading = false;
+                updateLoadingState();
                 sendBtn.disabled = false;
                 sendBtn.textContent = 'Send';
             }
@@ -555,7 +791,7 @@
         function changeModel(model) {
             currentModel = model;
             if (activeChat) {
-                activeChat.model = model;
+                activeChat.model = currentModel; // Always use the raw model ID, not display name
                 saveConversation();
             }
             updateModelInfo();
@@ -628,17 +864,35 @@
             try {
                 // Prevent switching conversations while a message is being sent
                 if (isLoading) {
-                    hideTypingIndicator();
-                    isLoading = false;
-                    const sendBtn = document.getElementById('sendBtn');
-                    sendBtn.disabled = false;
-                    sendBtn.textContent = 'Send';
-                    // Don't return - allow switching but reset the loading state
+                    alert('🐶 Woof! Please wait for Coco to finish responding before switching conversations! 🐕');
+                    return;
                 }
 
                 const response = await fetch(`/conversations/${id}`);
-                    activeChat = await response.json();
-                currentModel = activeChat.model || currentModel || 'grok-4-fast'; // Fallback to current or grok as last resort
+                activeChat = await response.json();
+
+                // Get the saved model, defaulting to current or fallback
+                let savedModel = activeChat.model || currentModel || 'grok-4-fast';
+
+                // Clean up any emoji formatting that might have been saved
+                const knownModelIds = Object.keys(modelCapabilities);
+
+                // If the saved model looks like a display name with emojis, convert it back
+                if (savedModel.includes('💬') || savedModel.includes('🎨') || savedModel.includes('❓')) {
+                    // Find the raw ID for this display name
+                    const rawId = Object.keys(modelNames).find(id => modelNames[id] === savedModel);
+                    if (rawId) {
+                        savedModel = rawId;
+                    }
+                }
+
+                // Ensure the model is valid, fallback if not
+                if (!knownModelIds.includes(savedModel)) {
+                    savedModel = knownModelIds[0] || 'grok-4-fast';
+                }
+
+                currentModel = savedModel;
+                activeChat.model = savedModel; // Update with clean model ID
                 const select = document.getElementById('modelSelect');
                 select.value = currentModel;
                     showChatInterface();
@@ -666,7 +920,7 @@
             }
         }
 
-        // Model display names mapping
+        // Clean model display names (no emojis)
         const modelNames = {
             'deepseek': 'DeepSeek',
             'gpt-5': 'GPT-5',
@@ -678,12 +932,58 @@
             'supermind-agent-v1': 'Supermind Agent'
         };
 
+        // Model capabilities for reference
+        const modelCapabilities = {
+            'deepseek': ['text'],
+            'gpt-5': ['text', 'vision'],
+            'gpt-image-1.5': ['image_generation'],
+            'grok-4-fast': ['text'],
+            'gemini-2.5-pro': ['text', 'vision'],
+            'gemini-3-flash-preview': ['text', 'vision'],
+            'gemini-2.5-flash-image': ['image_generation'],
+            'supermind-agent-v1': ['text', 'web_search']
+        };
+
         // Update model info display near input area
         function updateModelInfo() {
             const modelInfoDiv = document.getElementById('modelInfo');
-            if (modelInfoDiv) {
-                modelInfoDiv.textContent = modelNames[currentModel] || currentModel;
+            const capabilitiesDiv = document.getElementById('modelCapabilities');
+
+            if (modelInfoDiv && capabilitiesDiv) {
+                // Show clean model name
+                const displayName = modelNames[currentModel] || currentModel;
+                modelInfoDiv.textContent = displayName;
+
+                // Show capabilities
+                const caps = modelCapabilities[currentModel];
+                if (caps) {
+                    const capabilityDescriptions = {
+                        'text': '💬 Text Chat',
+                        'vision': '🔍 Image Analysis',
+                        'image_generation': '🎨 Image Generation',
+                        'web_search': '🌐 Web Search'
+                    };
+                    const descriptions = caps.map(cap => capabilityDescriptions[cap]).join(' • ');
+                    capabilitiesDiv.textContent = descriptions;
+                } else {
+                    capabilitiesDiv.textContent = '❓ Unknown capabilities';
+                }
             }
+        }
+
+        // Get capability description for tooltips
+        function getModelDescription(modelId) {
+            const caps = modelCapabilities[modelId];
+            if (!caps) {
+                return 'Unknown model capabilities';
+            }
+            const descriptions = {
+                'text': 'Text chat',
+                'vision': 'Image analysis',
+                'image_generation': 'Image generation',
+                'web_search': 'Web search'
+            };
+            return caps.map(cap => descriptions[cap]).join(', ');
         }
 
         // Update sidebar highlighting for active conversation
@@ -704,6 +1004,16 @@
             });
         }
 
+        // Update loading state visual indicator
+        function updateLoadingState() {
+            const sidebar = document.querySelector('.sidebar');
+            if (isLoading) {
+                sidebar.classList.add('loading');
+                } else {
+                sidebar.classList.remove('loading');
+            }
+        }
+
         // Show/hide typing indicator
         function showTypingIndicator() {
             const messagesDiv = document.getElementById('messages');
@@ -718,7 +1028,7 @@
 
             const typingText = document.createElement('div');
             typingText.className = 'typing-text';
-            typingText.textContent = 'AI is thinking';
+            typingText.textContent = '🐶 Coco is thinking';
 
             const dots = document.createElement('div');
             dots.className = 'typing-dots';
@@ -750,6 +1060,7 @@
         function cancelCurrentRequest() {
             if (isLoading) {
                 isLoading = false;
+                updateLoadingState();
                 hideTypingIndicator();
 
                 // Reset send button
@@ -760,12 +1071,12 @@
                 // Add cancelled message
                 const cancelledMessage = {
                     role: 'assistant',
-                    content: 'Request cancelled by user'
+                    content: '🐶 Woof! Request cancelled by human 🐕'
                 };
 
                 if (activeChat) {
                     activeChat.messages.push(cancelledMessage);
-                    renderMessages();
+            renderMessages();
                     saveConversation();
                 }
             }
@@ -785,8 +1096,10 @@
 
                     data.data.forEach(model => {
                         const option = document.createElement('option');
-                        option.value = model.id;
-                        option.textContent = modelNames[model.id] || model.id;
+                        option.value = model.id; // Always use raw model ID as value
+                        // Use clean model name, or fallback to model ID
+                        const displayName = modelNames[model.id] || model.id;
+                        option.textContent = displayName;
                         select.appendChild(option);
                     });
 
@@ -822,6 +1135,172 @@
             const firstModel = Object.keys(modelNames)[0];
             currentModel = firstModel;
             select.value = currentModel;
+        }
+
+        // Global variable to store current image
+        let currentImage = null;
+
+        // Show full-size image in modal
+        function showFullImage(src) {
+            try {
+                console.log('Opening full image modal with src:', src);
+
+                const modal = document.createElement('div');
+                modal.className = 'image-modal';
+                modal.onclick = () => modal.remove();
+
+                const img = document.createElement('img');
+                img.src = src;
+                img.onclick = (e) => e.stopPropagation(); // Prevent modal close when clicking image
+                img.onerror = () => {
+                    console.error('Failed to load image in modal:', src);
+                    alert('Failed to display the full-size image.');
+                    modal.remove();
+                };
+
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'close-modal';
+                closeBtn.textContent = '×';
+                closeBtn.onclick = () => modal.remove();
+
+                modal.appendChild(img);
+                modal.appendChild(closeBtn);
+                document.body.appendChild(modal);
+            } catch (error) {
+                console.error('Error opening image modal:', error);
+                alert('Failed to open the image viewer.');
+            }
+        }
+
+        // Handle file selection
+        function handleFileSelect(event) {
+            try {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    processImageFile(file);
+                } else if (file) {
+                    alert('Please select a valid image file.');
+                }
+            } catch (error) {
+                console.error('File selection error:', error);
+                alert('Failed to process the selected file. Please try again.');
+            }
+        }
+
+        // Trigger file input click
+        function triggerFileInput() {
+            document.getElementById('fileInput').click();
+        }
+
+        // Handle paste events for images
+        function handlePaste(event) {
+            try {
+                console.log('Paste event detected');
+                const items = event.clipboardData?.items;
+                if (!items) {
+                    console.log('No clipboard items found');
+                    return;
+                }
+
+                console.log('Found', items.length, 'clipboard items');
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    console.log('Item', i, 'type:', item.type);
+                    if (item.type.startsWith('image/')) {
+                        console.log('Found image in clipboard, processing...');
+                        event.preventDefault();
+                        const file = item.getAsFile();
+                        if (file) {
+                            console.log('Got file from clipboard:', file.name, file.size, 'bytes');
+                            processImageFile(file);
+                } else {
+                            console.warn('getAsFile() returned null');
+                        }
+                        break;
+                    }
+                }
+            } catch (error) {
+                console.error('Paste handling error:', error);
+                // Continue without showing error to user for paste events
+            }
+        }
+
+        // Process image file and show preview
+        function processImageFile(file) {
+            try {
+                if (!file || !file.type) {
+                    throw new Error('Invalid file object');
+                }
+
+                if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                    alert('Image file is too large. Please select an image under 10MB.');
+                    return;
+                }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dataUrl = e.target.result;
+                    if (typeof dataUrl !== 'string') {
+                        throw new Error('Invalid data URL format');
+                    }
+
+                    // Extract base64 data more safely
+                    const commaIndex = dataUrl.indexOf(',');
+                    if (commaIndex === -1) {
+                        throw new Error('Invalid data URL format - no comma separator');
+                    }
+
+                    const base64 = dataUrl.substring(commaIndex + 1);
+
+                    currentImage = {
+                        file: file,
+                        dataUrl: dataUrl,
+                        base64: base64
+                    };
+                    showImagePreview();
+            } catch (error) {
+                    console.error('Image processing error:', error);
+                    alert('Failed to process the pasted image. Please try uploading it instead.');
+                }
+            };
+            reader.onerror = function() {
+                console.error('FileReader error');
+                alert('Failed to read the pasted image. Please try uploading it instead.');
+            };
+            reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Image file processing error:', error);
+                alert('Failed to process the image file. Please try a different image.');
+            }
+        }
+
+        // Show image preview
+        function showImagePreview() {
+            if (!currentImage) return;
+
+            const preview = document.getElementById('imagePreview');
+            const img = document.getElementById('previewImage');
+
+            img.src = currentImage.dataUrl;
+            preview.style.display = 'block';
+
+            // Auto-resize textarea for better UX
+            const textarea = document.getElementById('messageInput');
+            textarea.style.minHeight = '60px';
+        }
+
+        // Remove current image
+        function removeImage() {
+            currentImage = null;
+            document.getElementById('imagePreview').style.display = 'none';
+
+            // Reset textarea height
+            const textarea = document.getElementById('messageInput');
+            textarea.style.minHeight = '20px';
+
+            // Clear file input
+            document.getElementById('fileInput').value = '';
         }
 
         loadModels();

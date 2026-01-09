@@ -13,6 +13,7 @@ fs.mkdir(conversationsDir, { recursive: true }).catch(console.error);
 // Chat with AI models
 app.post('/chat', async (req, res) => {
   const { messages, model = 'grok-4-fast' } = req.body;
+  console.log('Chat request received - Model:', model, 'Messages count:', messages.length);
 
   try {
     const token = process.env.AI_BUILDER_TOKEN;
@@ -22,22 +23,59 @@ app.post('/chat', async (req, res) => {
       });
     }
 
+    // Process messages to handle images
+    const processedMessages = messages.map(msg => {
+      // Only process if image exists AND has actual data
+      if (msg.image && msg.image.data && msg.image.mimeType) {
+        // Convert image data to the format expected by vision models
+        return {
+          role: msg.role,
+          content: [
+            {
+              type: 'text',
+              text: msg.content || 'Please analyze this image:'
+            },
+            {
+              type: 'image_url',
+              image_url: {
+                url: `data:${msg.image.mimeType};base64,${msg.image.data}`
+              }
+            }
+          ]
+        };
+      }
+      // For text-only messages or invalid image data, return as-is but clean up
+      const { image, ...cleanMsg } = msg; // Remove image field from text messages
+      return cleanMsg;
+    });
+
+    const requestBody = {
+      model,
+      messages: processedMessages,
+      temperature: 0.7
+    };
+
+    console.log('Sending to AI Builder:', JSON.stringify(requestBody, null, 2));
+
     const response = await fetch('https://space.ai-builders.com/backend/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ model, messages, temperature: 0.7 })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI Builder API Error:', response.status, errorText);
       return res.json({
         choices: [{ message: { role: 'assistant', content: `API Error: ${response.status}` } }]
       });
     }
 
     const data = await response.json();
+    console.log('AI Builder API Success Response:', JSON.stringify(data, null, 2));
     res.json(data);
   } catch (error) {
     res.json({
@@ -141,5 +179,6 @@ app.get('/', (req, res) => {
 
 const PORT = 3001;
 app.listen(PORT, () => {
-  console.log(`Chat server running at http://localhost:${PORT}`);
+  console.log(`🐕 Coco Chat server running at http://localhost:${PORT}`);
+  console.log(`🐶 Woof woof! Ready to chat with your furry AI friend!`);
 });
