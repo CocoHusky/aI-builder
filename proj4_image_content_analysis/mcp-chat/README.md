@@ -37,6 +37,7 @@ This application is ready for deployment on AI Builder platforms.
 ### Prerequisites
 - AI Builder account with API access
 - Valid `AI_BUILDER_TOKEN`
+- **Public GitHub repository** (required for deployment)
 
 ### Deployment Steps
 
@@ -44,8 +45,25 @@ This application is ready for deployment on AI Builder platforms.
    - Ensure all files are committed to your repository
    - Verify `package.json` includes all dependencies
    - Test locally: `npm install && npm start`
+   - **Make repository public** on GitHub (Settings → Danger Zone → Make public)
 
-2. **AI Builder Deployment**
+2. **AI Builder API Deployment**
+   **Note:** AI Builder uses Docker for deployment. The included `Dockerfile` handles the containerization automatically.
+
+   Run this curl command with your repository details:
+   ```bash
+   curl -X POST "https://space.ai-builders.com/backend/v1/deployments" \
+     -H "Authorization: Bearer YOUR_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "repo_url": "https://github.com/CocoHusky/AI-Builder",
+       "service_name": "coco-chat",
+       "branch": "main",
+       "port": 3001
+     }'
+   ```
+
+   **Alternative: Dashboard Deployment**
    - Access your AI Builder deployment dashboard
    - Create a new web application deployment
    - Select "Node.js" as the runtime environment
