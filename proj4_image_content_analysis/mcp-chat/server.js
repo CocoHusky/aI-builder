@@ -3,12 +3,15 @@ const path = require('path');
 const fs = require('fs').promises;
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Allow larger payloads for conversations
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Create conversations directory
 const conversationsDir = path.join(__dirname, 'conversations');
 fs.mkdir(conversationsDir, { recursive: true }).catch(console.error);
+
+// Trust proxy for proper IP detection in production
+app.set('trust proxy', 1);
 
 // Model capabilities for server-side processing
 const modelCapabilities = {
@@ -170,8 +173,14 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const PORT = 3001;
-app.listen(PORT, () => {
-  console.log(`🐕 Coco Chat server running at http://localhost:${PORT}`);
+// Use AI Builder's assigned port or default to 3001 for local development
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🐕 Coco Chat server running on port ${PORT}`);
   console.log(`🐶 Woof woof! Ready to chat with your furry AI friend!`);
+
+  // Log environment info for debugging
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`AI Builder Token: ${process.env.AI_BUILDER_TOKEN ? 'Set' : 'Not set'}`);
 });
