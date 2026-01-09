@@ -1,9 +1,0 @@
-# Coco Chat Environment Variables
-
-# AI Builder API Token (required)
-# Get this from: https://ai-builders.com
-AI_BUILDER_TOKEN=your_api_token_here
-
-# Server Configuration
-PORT=3001
-NODE_ENV=production

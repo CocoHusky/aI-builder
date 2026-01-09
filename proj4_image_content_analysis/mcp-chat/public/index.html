@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coco Chat</title>
+    <title>AI Chat</title>
     <style>
-        /* ChatGPT-like Interface Styles */
         :root {
             --bg-primary: #343541;
             --bg-secondary: #40414f;
@@ -13,11 +12,9 @@
             --text-primary: #ececf1;
             --text-secondary: #c5c5d2;
             --accent: #10a37f;
-            --accent-hover: #0e9380;
             --border: #565869;
             --user-bg: #343541;
             --assistant-bg: #444654;
-            --shadow: rgba(0, 0, 0, 0.15);
         }
 
         * {
@@ -27,10 +24,9 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background-color: var(--bg-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
             color: var(--text-primary);
-            line-height: 1.6;
             height: 100vh;
             overflow: hidden;
         }
@@ -38,187 +34,50 @@
         .app {
             display: flex;
             height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Sidebar Layout */
-        .new-chat-btn.sidebar-btn {
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .new-chat-btn.sidebar-btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .conversations-header {
-            padding: 8px 16px 4px 16px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 8px;
-        }
-
-        .conversations-header h4 {
-            margin: 0;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .conversation-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            margin: 2px 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            border: 1px solid transparent;
-        }
-
-        .conversation-item:hover {
-            background-color: var(--bg-tertiary);
-            border-color: var(--border);
-        }
-
-        .conversation-item.active {
-            background-color: var(--bg-tertiary);
-            border-color: var(--accent);
-        }
-
-        .conversation-title {
-            flex: 1;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .conversation-meta {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-right: 8px;
-        }
-
-        .conversation-delete {
-            opacity: 0;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 14px;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .conversation-item:hover .conversation-delete {
-            opacity: 1;
-        }
-
-        .conversation-delete:hover {
-            color: #ef4444;
-            background-color: rgba(239, 68, 68, 0.1);
-        }
-
-        .model-section {
-            margin-top: 16px;
-            border-top: 1px solid var(--border);
-            padding-top: 16px;
-        }
-
-        .model-selector-header h4 {
-            margin: 0 0 8px 0;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-model-selector select {
-            width: 100%;
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            padding: 12px 16px;
-            font-size: 14px;
-            font-family: inherit;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.2s;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c5c5d2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-            padding-right: 40px;
-        }
-
-        .sidebar-model-selector select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.1);
-        }
-
-        .sidebar-model-selector select:hover {
-            border-color: var(--text-secondary);
-        }
-
-        .sidebar-model-selector option {
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 8px;
         }
 
         /* Sidebar */
         .sidebar {
             width: 260px;
-            background-color: var(--bg-secondary);
+            background: var(--bg-secondary);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
         }
 
-        .sidebar-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
         .new-chat-btn {
-            width: 100%;
+            width: calc(100% - 24px);
             padding: 12px 16px;
-            background-color: transparent;
-            border: 1px solid var(--border);
+            margin: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
             border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
+            font-size: 14px;
         }
 
         .new-chat-btn:hover {
-            background-color: var(--bg-tertiary);
-            border-color: var(--text-secondary);
+            background: #0e9380;
+        }
+
+        .model-selector {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .model-selector select {
+            width: 100%;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
         }
 
         .chat-list {
             flex: 1;
             overflow-y: auto;
-            padding: 8px 0;
         }
 
         .chat-item {
@@ -228,17 +87,17 @@
             margin: 2px 8px;
             border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s;
-            position: relative;
+            transition: background 0.2s;
         }
 
         .chat-item:hover {
-            background-color: var(--bg-tertiary);
+            background: var(--bg-tertiary);
         }
 
         .chat-item.active {
-            background-color: var(--bg-tertiary);
-            border: 1px solid var(--accent);
+            background: var(--bg-tertiary);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
         }
 
         .chat-title {
@@ -249,15 +108,28 @@
             white-space: nowrap;
         }
 
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .chat-item:hover .delete-btn {
+            opacity: 1;
+        }
+
         /* Main Chat Area */
         .main-chat {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background-color: var(--bg-primary);
+            position: relative;
         }
 
-        /* Welcome Screen */
         .welcome {
             flex: 1;
             display: flex;
@@ -266,16 +138,15 @@
             justify-content: center;
             text-align: center;
             padding: 40px;
+            padding-bottom: 140px; /* Space for fixed input area */
         }
 
         .welcome h1 {
             font-size: 32px;
             margin-bottom: 16px;
-            color: var(--text-primary);
         }
 
         .welcome p {
-            font-size: 18px;
             color: var(--text-secondary);
             margin-bottom: 32px;
         }
@@ -285,7 +156,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            max-height: calc(100vh - 120px);
+            padding-bottom: 140px; /* Space for fixed input area */
         }
 
         .message {
@@ -319,52 +190,34 @@
         }
 
         .message.user .message-content {
-            background-color: var(--user-bg);
-            color: var(--text-primary);
+            background: var(--user-bg);
             border: 1px solid var(--border);
         }
 
         .message.assistant .message-content {
-            background-color: var(--assistant-bg);
-            color: var(--text-primary);
+            background: var(--assistant-bg);
             border: 1px solid var(--border);
-        }
-
-        /* Typing Indicator */
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 8px 0;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--text-secondary);
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% {
-                opacity: 0.4;
-                transform: scale(0.8);
-            }
-            30% {
-                opacity: 1;
-                transform: scale(1);
-            }
         }
 
         /* Input Area */
         .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 260px; /* Width of sidebar */
+            right: 0;
             padding: 20px;
-            background-color: var(--bg-primary);
+            background: var(--bg-primary);
             border-top: 1px solid var(--border);
+            z-index: 10;
+        }
+
+        .model-info-bar {
+            text-align: center;
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: 12px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
         }
 
         .input-container {
@@ -380,7 +233,7 @@
             padding: 12px 16px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            background-color: var(--bg-secondary);
+            background: var(--bg-secondary);
             color: var(--text-primary);
             font-size: 15px;
             font-family: inherit;
@@ -388,7 +241,6 @@
             min-height: 20px;
             max-height: 200px;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         .input-container textarea:focus {
@@ -397,98 +249,91 @@
 
         .send-btn {
             padding: 12px 20px;
-            background-color: var(--accent);
-            border: none;
-            border-radius: 8px;
+            background: var(--accent);
             color: white;
-            font-size: 14px;
-            font-weight: 500;
+            border: none;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s;
-            min-width: 80px;
+            font-size: 14px;
         }
 
-        .send-btn:hover:not(:disabled) {
-            background-color: var(--accent-hover);
+        .send-btn:hover {
+            background: #0e9380;
         }
 
         .send-btn:disabled {
-            opacity: 0.6;
+            background: var(--text-secondary);
             cursor: not-allowed;
         }
 
-
-        .saved-conversation {
-            opacity: 0.8;
+        /* Typing Indicator */
+        .typing-indicator {
+            margin-bottom: 24px;
+            animation: fadeIn 0.3s ease-in;
         }
 
-        .saved-conversation:hover {
-            opacity: 1;
-            background-color: var(--bg-tertiary);
+        .typing-indicator .message-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--assistant-bg);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            border-radius: 18px;
         }
 
-        .saved-conversation.active {
-            opacity: 1;
-            background-color: var(--bg-tertiary);
-            border-left: 3px solid var(--accent);
+        .typing-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-style: italic;
         }
 
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                position: absolute;
-                z-index: 10;
-                transform: translateX(-100%);
-            }
-
-            .main-chat {
-                width: 100%;
-            }
-
-            .message-content {
-                max-width: 90%;
-            }
+        .typing-dots {
+            display: flex;
+            gap: 4px;
         }
 
-        /* Scrollbar Styling */
-        .messages::-webkit-scrollbar {
+        .typing-dots span {
             width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--text-secondary);
+            animation: typingBounce 1.4s infinite ease-in-out;
         }
 
-        .messages::-webkit-scrollbar-track {
-            background: var(--bg-primary);
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
-        .messages::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
+        .cancel-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            margin-left: auto;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .messages::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
-        }
-
-        /* Toast notifications */
-        .toast {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-        }
-
-        .toast-success {
-            background-color: #10a37f !important;
-        }
-
-        .toast-error {
-            background-color: #ef4444 !important;
-        }
-
-        .toast-warning {
-            background-color: #f59e0b !important;
-        }
-
-        .toast-info {
-            background-color: #3b82f6 !important;
+        .cancel-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
         }
     </style>
 </head>
@@ -496,32 +341,39 @@
     <div class="app">
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="sidebar-header">
                 <button class="new-chat-btn" onclick="createNewChat()">New Chat</button>
+
+            <div class="model-selector">
+                <select id="modelSelect" onchange="changeModel(this.value)">
+                    <!-- Models will be loaded dynamically -->
+                </select>
             </div>
+
             <div class="chat-list" id="chatList">
-                <!-- Chat items will be added here -->
+                <!-- Chat items will be loaded here -->
             </div>
         </div>
 
         <!-- Main Chat Area -->
         <div class="main-chat">
             <div class="welcome" id="welcome">
-                <h1>Welcome to Coco Chat</h1>
-                <p>Start a new conversation with the AI</p>
-                <button class="new-chat-btn large" onclick="createNewChat()">Start New Chat</button>
+                <h1>AI Chat</h1>
+                <p>Start a new conversation with AI</p>
+                <button class="new-chat-btn" onclick="createNewChat()">Start Chat</button>
             </div>
 
             <div class="messages" id="messages" style="display: none;">
                 <!-- Messages will be added here -->
             </div>
 
-            <!-- Input Area -->
             <div class="input-area" id="inputArea" style="display: none;">
+                <div class="model-info-bar">
+                    <span>Using: <span id="modelInfo">Grok-4-Fast</span></span>
+                </div>
                 <div class="input-container">
                     <textarea
                         id="messageInput"
-                        placeholder="Type your message here..."
+                        placeholder="Type your message..."
                         rows="1"
                         onkeydown="handleKeyPress(event)"
                     ></textarea>
@@ -534,73 +386,50 @@
     <script>
         let activeChat = null;
         let isLoading = false;
-        let conversations = [];
-        let currentModel = 'grok-4-fast';
-        let currentModel = 'grok-4-fast';
+        let currentModel = null; // Will be set dynamically from API
+
+        // Load conversations on startup
+        loadConversations();
 
         function createNewChat() {
-            // Create a fresh new chat
-            const newChat = {
-                id: Date.now(),
-                title: "New Chat",
-                messages: [], // Always start with empty messages
-                createdAt: new Date()
-            };
-
-            activeChat = newChat;
-            renderMessages();
-            showChatInterface();
-        }
-
-        function renderChatList() {
-            renderSidebar();
-        }
-
-        function renderMessages() {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML = '';
-
-            if (!activeChat) return;
-
-            // Display model info at the top of the chat
-            const modelInfo = document.createElement('div');
-            modelInfo.className = 'model-info';
-            modelInfo.innerHTML = `
-                <div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 12px; border-bottom: 1px solid var(--border); margin-bottom: 20px;">
-                    ${getModelEmoji(activeChat.model)} ${getModelDisplayName(activeChat.model)}
-                </div>
-            `;
-            messagesDiv.appendChild(modelInfo);
-
-            activeChat.messages.forEach(message => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${message.role}`;
-
-                const messageContent = document.createElement('div');
-                messageContent.className = 'message-content';
-                messageContent.textContent = message.content;
-
-                messageDiv.appendChild(messageContent);
-                messagesDiv.appendChild(messageDiv);
-            });
-
+            // Prevent creating new conversations while a message is being sent
             if (isLoading) {
-                const typingDiv = document.createElement('div');
-                typingDiv.className = 'message assistant';
-
-                const typingContent = document.createElement('div');
-                typingContent.className = 'message-content typing';
-
-                const typingIndicator = document.createElement('div');
-                typingIndicator.className = 'typing-indicator';
-                typingIndicator.innerHTML = '<span></span><span></span><span></span>';
-
-                typingContent.appendChild(typingIndicator);
-                typingDiv.appendChild(typingContent);
-                messagesDiv.appendChild(typingDiv);
+                hideTypingIndicator();
+                isLoading = false;
+                const sendBtn = document.getElementById('sendBtn');
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send';
+                // Don't return - allow creating but reset the loading state
             }
 
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            activeChat = {
+                id: Date.now().toString(),
+                title: 'New Chat',
+                messages: [],
+                model: currentModel,
+                timestamp: new Date().toISOString()
+            };
+
+            showChatInterface();
+            renderMessages();
+            updateModelInfo();
+            updateSidebarHighlighting();
+            saveConversation();
+        }
+
+        // Generate conversation title from first user message
+        function generateConversationTitle(messages) {
+            const firstUserMessage = messages.find(msg => msg.role === 'user');
+            if (!firstUserMessage) return 'New Chat';
+
+            // Take first 50 characters of the message
+            const content = firstUserMessage.content;
+            if (content.length <= 50) return content;
+
+            // Try to cut at word boundary
+            const truncated = content.substring(0, 50);
+            const lastSpace = truncated.lastIndexOf(' ');
+            return lastSpace > 0 ? truncated.substring(0, lastSpace) + '...' : truncated + '...';
         }
 
         function showChatInterface() {
@@ -609,67 +438,106 @@
             document.getElementById('inputArea').style.display = 'block';
         }
 
+        function renderMessages() {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = '';
+
+            if (!activeChat) return;
+
+            // Add messages
+            activeChat.messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.role}`;
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.textContent = message.content;
+
+                messageDiv.appendChild(contentDiv);
+                messagesDiv.appendChild(messageDiv);
+            });
+
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Update model info near input area
+            updateModelInfo();
+        }
+
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const sendBtn = document.getElementById('sendBtn');
 
-            if (!input.value.trim() || isLoading) return;
+            if (!input.value.trim() || isLoading || !activeChat) return;
 
-            const userMessage = { role: "user", content: input.value.trim() };
+            // Capture the current conversation to ensure messages go to the right chat
+            const targetChat = activeChat;
+            const conversationId = targetChat.id;
 
-            if (!activeChat) {
-                await createNewChat();
-            }
-
-            activeChat.messages.push(userMessage);
+            const userMessage = { role: 'user', content: input.value.trim() };
+            targetChat.messages.push(userMessage);
             input.value = '';
             isLoading = true;
             sendBtn.disabled = true;
             sendBtn.textContent = '...';
 
             renderMessages();
+            showTypingIndicator();
+
+            const modelToUse = targetChat.model || currentModel;
 
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        messages: activeChat.messages,
-                        model: currentModel
+                        messages: targetChat.messages,
+                        model: modelToUse
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
                 const data = await response.json();
 
-                let assistantMessage;
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    assistantMessage = data.choices[0].message;
-                } else if (data.content) {
-                    assistantMessage = { role: "assistant", content: data.content };
-                } else {
-                    throw new Error("Unexpected response format from server");
-                }
+                if (data.choices && data.choices[0]) {
+                    const assistantMessage = data.choices[0].message;
 
+                    // Only add response to the target conversation if it's still the active one
+                    // or if we can find it in our conversations
+                    if (activeChat && activeChat.id === conversationId) {
                 activeChat.messages.push(assistantMessage);
-                activeChat.updatedAt = new Date().toISOString();
-
+                        hideTypingIndicator();
                 renderMessages();
-
-                // Auto-save conversation
-                autoSaveConversation();
-
+                        saveConversation();
+                    } else {
+                        // If user switched conversations, save the response to the correct conversation
+                        targetChat.messages.push(assistantMessage);
+                        // Save this specific conversation
+                        await fetch('/conversations', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(targetChat)
+                        });
+                        hideTypingIndicator();
+                        loadConversations();
+                    }
+                }
             } catch (error) {
-                console.error("Error sending message:", error);
-                const errorMessage = {
-                    role: "assistant",
-                    content: `Sorry, there was an error: ${error.message}. Please check that the backend server is running.`
-                };
+                const errorMessage = { role: 'assistant', content: `Error: ${error.message}` };
+
+                // Same logic - ensure error goes to the correct conversation
+                if (activeChat && activeChat.id === conversationId) {
                 activeChat.messages.push(errorMessage);
+                    hideTypingIndicator();
                 renderMessages();
+                } else {
+                    targetChat.messages.push(errorMessage);
+                    await fetch('/conversations', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(targetChat)
+                    });
+                    hideTypingIndicator();
+                    loadConversations();
+                }
             } finally {
                 isLoading = false;
                 sendBtn.disabled = false;
@@ -684,359 +552,279 @@
             }
         }
 
-
-
-
-
-
-        // Show toast notification
-        function showToast(message, type = 'info') {
-            // Remove existing toast
-            const existingToast = document.querySelector('.toast');
-            if (existingToast) {
-                existingToast.remove();
+        function changeModel(model) {
+            currentModel = model;
+            if (activeChat) {
+                activeChat.model = model;
+                saveConversation();
             }
-
-            // Create new toast
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = message;
-
-            // Style the toast
-            Object.assign(toast.style, {
-                position: 'fixed',
-                top: '20px',
-                right: '20px',
-                padding: '12px 20px',
-                borderRadius: '8px',
-                color: 'white',
-                fontSize: '14px',
-                fontWeight: '500',
-                zIndex: '1000',
-                opacity: '0',
-                transform: 'translateY(-20px)',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-            });
-
-            // Set background color based on type
-            const colors = {
-                success: '#10a37f',
-                error: '#ef4444',
-                warning: '#f59e0b',
-                info: '#3b82f6'
-            };
-            toast.style.backgroundColor = colors[type] || colors.info;
-
-            document.body.appendChild(toast);
-
-            // Animate in
-            setTimeout(() => {
-                toast.style.opacity = '1';
-                toast.style.transform = 'translateY(0)';
-            }, 10);
-
-            // Auto remove after 3 seconds
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(-20px)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            updateModelInfo();
         }
 
-        // Render sidebar with conversations and model selector
-        function renderSidebar() {
-            const chatList = document.getElementById('chatList');
-            chatList.innerHTML = '';
+        async function saveConversation() {
+            if (!activeChat) return;
 
-            // Add New Chat button
-            const newChatBtn = document.createElement('button');
-            newChatBtn.className = 'new-chat-btn sidebar-btn';
-            newChatBtn.innerHTML = '➕ New Chat';
-            newChatBtn.onclick = () => createNewChat();
-            chatList.appendChild(newChatBtn);
+            // Generate a proper title from the conversation content
+            if (activeChat.messages.length > 0 && activeChat.title === 'New Chat') {
+                activeChat.title = generateConversationTitle(activeChat.messages);
+            }
 
-            // Add conversations section
-            if (conversations.length > 0) {
-                const conversationsHeader = document.createElement('div');
-                conversationsHeader.className = 'conversations-header';
-                conversationsHeader.innerHTML = '<h4>💬 Conversations</h4>';
-                chatList.appendChild(conversationsHeader);
-
-                conversations.forEach(conversation => {
-                    const conversationItem = document.createElement('div');
-                    conversationItem.className = `conversation-item ${activeChat && activeChat.id === conversation.id ? 'active' : ''}`;
-                    conversationItem.onclick = () => loadConversation(conversation.id);
-
-                    const titleDiv = document.createElement('div');
-                    titleDiv.className = 'conversation-title';
-                    titleDiv.textContent = conversation.title;
-
-                    const metaDiv = document.createElement('div');
-                    metaDiv.className = 'conversation-meta';
-                    const modelEmoji = getModelEmoji(conversation.model);
-                    metaDiv.textContent = `${modelEmoji} ${conversation.messageCount} msgs`;
-
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'conversation-delete';
-                    deleteBtn.innerHTML = '🗑️';
-                    deleteBtn.title = 'Delete conversation';
-                    deleteBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        deleteConversation(conversation.id);
-                    };
-
-                    conversationItem.appendChild(titleDiv);
-                    conversationItem.appendChild(metaDiv);
-                    conversationItem.appendChild(deleteBtn);
-                    chatList.appendChild(conversationItem);
+            try {
+                await fetch('/conversations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(activeChat)
                 });
+                loadConversations();
+            } catch (error) {
+                console.error('Save failed:', error);
             }
-
-            // Add model selector at bottom
-            const modelSection = document.createElement('div');
-            modelSection.className = 'model-section';
-
-            const modelHeader = document.createElement('div');
-            modelHeader.className = 'model-selector-header';
-            modelHeader.innerHTML = '<h4>🤖 Model</h4>';
-            modelSection.appendChild(modelHeader);
-
-            const selectorContainer = document.createElement('div');
-            selectorContainer.className = 'sidebar-model-selector';
-
-            const select = document.createElement('select');
-            select.id = 'sidebarModelSelect';
-            select.onchange = (e) => changeModel(e.target.value);
-
-            selectorContainer.appendChild(select);
-            modelSection.appendChild(selectorContainer);
-            chatList.appendChild(modelSection);
-
-            // Load models into the selector
-            loadModelsForSelector();
         }
 
-        // Load conversations from server
         async function loadConversations() {
             try {
                 const response = await fetch('/conversations');
-                if (response.ok) {
-                    conversations = await response.json();
-                    renderSidebar();
-                }
+                const conversations = await response.json();
+
+            const chatList = document.getElementById('chatList');
+            chatList.innerHTML = '';
+
+                conversations.forEach(conv => {
+                    const item = document.createElement('div');
+                    item.className = 'chat-item' + (activeChat && activeChat.id === conv.id ? ' active' : '');
+                    item.onclick = (e) => {
+                        e.preventDefault();
+                        loadConversation(conv.id);
+                    };
+
+                    const title = document.createElement('div');
+                    title.className = 'chat-title';
+
+                    // Use the conversation title, or generate from first message if it's still "New Chat"
+                    let displayTitle = conv.title;
+                    if (conv.title === 'New Chat' && conv.messages && conv.messages.length > 0) {
+                        displayTitle = generateConversationTitle(conv.messages);
+                    }
+                    title.textContent = displayTitle;
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '×';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteConversation(conv.id);
+                    };
+
+                    item.appendChild(title);
+                    item.appendChild(deleteBtn);
+                    chatList.appendChild(item);
+                });
             } catch (error) {
-                console.error('Error loading conversations:', error);
+                console.error('Load conversations failed:', error);
             }
         }
 
-        // Create new chat
-        async function createNewChat() {
-            // Save current chat if it has messages
-            if (activeChat && activeChat.messages && activeChat.messages.length > 0) {
-                await saveCurrentConversation();
-            }
-
-            // Create fresh new chat
-            activeChat = {
-                id: Date.now().toString(),
-                title: 'New Chat',
-                messages: [],
-                model: currentModel,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-
-            renderMessages();
-            showChatInterface();
-            renderSidebar();
-        }
-
-        // Load conversation
         async function loadConversation(id) {
             try {
-                // Save current chat first
-                if (activeChat && activeChat.messages && activeChat.messages.length > 0) {
-                    await saveCurrentConversation();
+                // Prevent switching conversations while a message is being sent
+                if (isLoading) {
+                    hideTypingIndicator();
+                    isLoading = false;
+                    const sendBtn = document.getElementById('sendBtn');
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'Send';
+                    // Don't return - allow switching but reset the loading state
                 }
 
                 const response = await fetch(`/conversations/${id}`);
-                if (response.ok) {
                     activeChat = await response.json();
-                    currentModel = activeChat.model || 'grok-4-fast';
-                    renderMessages();
+                currentModel = activeChat.model || currentModel || 'grok-4-fast'; // Fallback to current or grok as last resort
+                const select = document.getElementById('modelSelect');
+                select.value = currentModel;
                     showChatInterface();
-                    renderSidebar();
-                    showToast('Conversation loaded', 'success');
-                } else {
-                    showToast('Failed to load conversation', 'error');
-                }
+                renderMessages();
+                updateModelInfo();
+                updateSidebarHighlighting(); // Update sidebar highlighting
             } catch (error) {
-                console.error('Error loading conversation:', error);
-                showToast('Error loading conversation', 'error');
+                console.error('Load conversation failed:', error);
             }
         }
 
-        // Save current conversation
-        async function saveCurrentConversation() {
-            if (!activeChat || !activeChat.messages || activeChat.messages.length === 0) {
-                return;
-            }
-
-            try {
-                // Generate title from first message if it's still "New Chat"
-                if (activeChat.title === 'New Chat' && activeChat.messages.length > 0) {
-                    const firstMessage = activeChat.messages.find(m => m.role === 'user');
-                    if (firstMessage) {
-                        activeChat.title = firstMessage.content.slice(0, 50) +
-                            (firstMessage.content.length > 50 ? '...' : '');
-                    }
-                }
-
-                activeChat.updatedAt = new Date().toISOString();
-
-                const response = await fetch('/conversations', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: activeChat.id,
-                        title: activeChat.title,
-                        messages: activeChat.messages,
-                        model: currentModel
-                    })
-                });
-
-                if (response.ok) {
-                    console.log('Conversation saved');
-                    loadConversations(); // Refresh the sidebar
-                }
-            } catch (error) {
-                console.error('Error saving conversation:', error);
-            }
-        }
-
-        // Delete conversation
         async function deleteConversation(id) {
-            if (!confirm('Are you sure you want to delete this conversation?')) {
-                return;
-            }
-
             try {
-                const response = await fetch(`/conversations/${id}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    // Remove from conversations array
-                    conversations = conversations.filter(conv => conv.id !== id);
-
-                    // If this was the active conversation, create a new one
-                    if (activeChat && activeChat.id === id) {
-                        await createNewChat();
-                    } else {
-                        renderSidebar();
-                    }
-
-                    showToast('Conversation deleted', 'success');
-                } else {
-                    showToast('Failed to delete conversation', 'error');
+                await fetch(`/conversations/${id}`, { method: 'DELETE' });
+                if (activeChat && activeChat.id === id) {
+                    activeChat = null;
+                    document.getElementById('welcome').style.display = 'flex';
+                    document.getElementById('messages').style.display = 'none';
+                    document.getElementById('inputArea').style.display = 'none';
                 }
+                loadConversations();
+                updateSidebarHighlighting();
             } catch (error) {
-                console.error('Error deleting conversation:', error);
-                showToast('Error deleting conversation', 'error');
+                console.error('Delete failed:', error);
             }
         }
 
-        // Auto-save conversation after each message
-        async function autoSaveConversation() {
-            if (activeChat && activeChat.messages && activeChat.messages.length > 0) {
-                await saveCurrentConversation();
+        // Model display names mapping
+        const modelNames = {
+            'deepseek': 'DeepSeek',
+            'gpt-5': 'GPT-5',
+            'gpt-image-1.5': 'GPT Image 1.5',
+            'grok-4-fast': 'Grok-4-Fast',
+            'gemini-2.5-pro': 'Gemini 2.5 Pro',
+            'gemini-3-flash-preview': 'Gemini 3 Flash',
+            'gemini-2.5-flash-image': 'Gemini Image',
+            'supermind-agent-v1': 'Supermind Agent'
+        };
+
+        // Update model info display near input area
+        function updateModelInfo() {
+            const modelInfoDiv = document.getElementById('modelInfo');
+            if (modelInfoDiv) {
+                modelInfoDiv.textContent = modelNames[currentModel] || currentModel;
             }
         }
 
-        // Get model emoji for display
-        function getModelEmoji(model) {
-            const emojis = {
-                'grok-4-fast': '🚀',
-                'supermind-agent-v1': '🧠',
-                'gemini-2.5-pro': '💎',
-                'gemini-3-flash-preview': '⚡',
-                'gpt-5': '🔬',
-                'deepseek': '💰'
-            };
-            return emojis[model] || '🤖';
+        // Update sidebar highlighting for active conversation
+        function updateSidebarHighlighting() {
+            const chatItems = document.querySelectorAll('.chat-item');
+            chatItems.forEach(item => {
+                // Remove active class from all items
+                item.classList.remove('active');
+
+                // Find the conversation ID from the onclick handler
+                const onclickAttr = item.onclick?.toString();
+                if (onclickAttr && activeChat) {
+                    const match = onclickAttr.match(/loadConversation\(['"]([^'"]+)['"]\)/);
+                    if (match && match[1] === activeChat.id) {
+                        item.classList.add('active');
+                    }
+                }
+            });
         }
 
-        // Load models specifically for the sidebar selector
-        async function loadModelsForSelector() {
-            const fallbackModels = [
-                { id: 'grok-4-fast' },
-                { id: 'supermind-agent-v1' },
-                { id: 'gemini-2.5-pro' },
-                { id: 'gemini-3-flash-preview' },
-                { id: 'gpt-5' },
-                { id: 'deepseek' }
-            ];
+        // Show/hide typing indicator
+        function showTypingIndicator() {
+            const messagesDiv = document.getElementById('messages');
+            const existingTyping = messagesDiv.querySelector('.typing-indicator');
+            if (existingTyping) return; // Already showing
+
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant typing-indicator';
+
+            const typingContent = document.createElement('div');
+            typingContent.className = 'message-content typing';
+
+            const typingText = document.createElement('div');
+            typingText.className = 'typing-text';
+            typingText.textContent = 'AI is thinking';
+
+            const dots = document.createElement('div');
+            dots.className = 'typing-dots';
+            dots.innerHTML = '<span></span><span></span><span></span>';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'cancel-btn';
+            cancelBtn.textContent = 'cancel';
+            cancelBtn.title = 'Cancel request';
+            cancelBtn.onclick = cancelCurrentRequest;
+
+            typingContent.appendChild(typingText);
+            typingContent.appendChild(dots);
+            typingContent.appendChild(cancelBtn);
+            typingDiv.appendChild(typingContent);
+            messagesDiv.appendChild(typingDiv);
+
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.querySelector('.typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        // Cancel current request
+        function cancelCurrentRequest() {
+            if (isLoading) {
+                isLoading = false;
+                hideTypingIndicator();
+
+                // Reset send button
+                const sendBtn = document.getElementById('sendBtn');
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send';
+
+                // Add cancelled message
+                const cancelledMessage = {
+                    role: 'assistant',
+                    content: 'Request cancelled by user'
+                };
+
+                if (activeChat) {
+                    activeChat.messages.push(cancelledMessage);
+                    renderMessages();
+                    saveConversation();
+                }
+            }
+        }
+
+        // Load models
+        async function loadModels() {
+            const select = document.getElementById('modelSelect');
+            select.innerHTML = '<option>Loading models...</option>';
 
             try {
                 const response = await fetch('/models');
-                if (response.ok) {
                     const data = await response.json();
-                    console.log('API Models loaded for selector:', data.data);
-                    populateSidebarSelector(data.data || fallbackModels);
+
+                if (data.data && Array.isArray(data.data)) {
+                    select.innerHTML = '';
+
+                    data.data.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.id;
+                        option.textContent = modelNames[model.id] || model.id;
+                        select.appendChild(option);
+                    });
+
+                    // Set default model
+                    if (data.data.length > 0) {
+                        currentModel = data.data[0].id;
+                        select.value = currentModel;
+                    }
                 } else {
-                    console.log('API returned error, using fallback models for selector');
-                    populateSidebarSelector(fallbackModels);
+                    // Fallback to hardcoded models if API fails
+                    loadFallbackModels();
                 }
             } catch (error) {
-                console.log('Error loading models from API for selector, using fallback:', error.message);
-                populateSidebarSelector(fallbackModels);
+                console.error('Load models failed:', error);
+                loadFallbackModels();
             }
         }
 
-        // Populate sidebar model selector
-        function populateSidebarSelector(models) {
-            const select = document.getElementById('sidebarModelSelect');
-            if (!select) return;
-
-            // Clear existing options
+        // Fallback models in case API fails
+        function loadFallbackModels() {
+            const select = document.getElementById('modelSelect');
             select.innerHTML = '';
 
-            // Add models
-            models.forEach(model => {
+            // Use all models from our mapping as fallback
+            Object.entries(modelNames).forEach(([id, name]) => {
                 const option = document.createElement('option');
-                option.value = model.id;
-                option.textContent = getModelDisplayName(model.id);
+                option.value = id;
+                option.textContent = name;
                 select.appendChild(option);
             });
 
-            // Set current model
+            // Set first available model as default
+            const firstModel = Object.keys(modelNames)[0];
+            currentModel = firstModel;
             select.value = currentModel;
-
-            console.log(`Sidebar selector populated with ${models.length} models`);
         }
 
-        // Change model
-        function changeModel(model) {
-            currentModel = model;
-            showToast(`Switched to ${getModelDisplayName(model)}`, 'success');
-        }
-
-        // Get display name for model
-        function getModelDisplayName(model) {
-            const names = {
-                'grok-4-fast': 'Grok-4-Fast',
-                'supermind-agent-v1': '🚀 Supermind Agent v1',
-                'gemini-2.5-pro': 'Gemini 2.5 Pro',
-                'gemini-3-flash-preview': 'Gemini 3 Flash',
-                'gpt-5': 'GPT-5',
-                'deepseek': 'DeepSeek'
-            };
-            return names[model] || model;
-        }
-
-        // Initialize
-        loadConversations();
+        loadModels();
     </script>
 </body>
 </html>

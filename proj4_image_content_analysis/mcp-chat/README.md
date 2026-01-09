@@ -1,71 +1,44 @@
-# Coco Chat 🤖
+# AI Chat
 
-A beautiful ChatGPT-like interface that connects to multiple AI models via the AI Builder API. Run locally as a simple server!
+A simple ChatGPT-like interface for chatting with AI models via the AI Builder API.
 
-## ✨ Features
+## Features
 
-- ✅ ChatGPT-like dark interface
-- ✅ **Persistent conversation saving** - Save, load, and delete conversations like ChatGPT
-- ✅ **Complete conversation isolation** - Each chat is completely separate with no bleeding
-- ✅ **Beautiful sidebar model selector** - Switch between all available AI models
-- ✅ **New Chat button** - Start fresh conversations anytime
-- ✅ **Auto-save** - Conversations saved automatically after each message
-- ✅ **Model display in chat** - See which model you're using in each conversation
+- **ChatGPT-like interface** - Dark theme with sidebar and chat area
+- **Conversation management** - Save, load, and delete conversations
+- **Model selection** - Choose from available AI models
+- **Individual conversations** - Each chat is completely separate
 
-## 🚀 Quick Start
+## Quick Start
 
-```bash
-# Install dependencies
-npm install
+1. Set your AI Builder token:
+   ```bash
+   export AI_BUILDER_TOKEN=your_token_here
+   ```
 
-# Set your AI Builder token
-export AI_BUILDER_TOKEN=your_token_here
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-# Run locally
-npm start
-```
+3. Start the server:
+   ```bash
+   npm start
+   ```
 
-Open **http://localhost:3001** in your browser!
+4. Open http://localhost:3001 in your browser
 
-## 📁 Project Structure
-```
-coco-chat/
-├── server.js              # Express server with AI Builder API
-├── public/
-│   └── index.html         # ChatGPT-like interface
-├── conversations/         # Auto-created directory for saved chats
-├── package.json           # Dependencies & scripts
-└── README.md             # This file
-```
+## Usage
 
-## Conversation Storage:
-Conversations are automatically saved to `conversations/` directory as JSON files.
-Each conversation includes:
-- Full message history
-- Title and timestamp
-- Unique ID for loading
-- Model used for the conversation
+- Click "New Chat" to start a conversation
+- Select your preferred AI model from the dropdown
+- Type messages and press Enter to send
+- Conversations are automatically saved
+- Click on saved conversations in the sidebar to reload them
+- Hover over conversations and click × to delete them
 
-## 🎯 Model Selection
+## Project Structure
 
-The interface includes a **model selector** in the **left sidebar** that allows you to choose which AI model to use for new conversations:
-
-### 📋 **Available Models:**
-- **Grok-4-Fast** - X.AI's fastest model (default)
-- **Supermind Agent v1** - Multi-tool agent with web search
-- **Gemini 2.5 Pro** - Google's advanced reasoning model
-- **Gemini 3 Flash** - Fast Gemini model
-- **GPT-5** - OpenAI's latest
-- **DeepSeek** - Cost-effective alternative
-
-**How to use:**
-1. Select a model from the dropdown in the left sidebar before starting a new chat
-2. Each conversation uses the model selected when it was created
-3. The model is displayed at the top of each chat
-
-The interface shows all available models with emoji icons for easy identification.
-
-## 🔒 Security Notes
-- Never commit your `AI_BUILDER_TOKEN` to GitHub
-- Use environment variables for all secrets
-- The app runs on port 3001 by default
+- `server.js` - Express server with API endpoints
+- `public/index.html` - Chat interface
+- `conversations/` - Auto-created directory for saved chats

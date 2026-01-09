@@ -6,10 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Create conversations directory if it doesn't exist
+// Create conversations directory
 const conversationsDir = path.join(__dirname, 'conversations');
 fs.mkdir(conversationsDir, { recursive: true }).catch(console.error);
 
+// Chat with AI models
 app.post('/chat', async (req, res) => {
   const { messages, model = 'grok-4-fast' } = req.body;
 
@@ -17,12 +18,7 @@ app.post('/chat', async (req, res) => {
     const token = process.env.AI_BUILDER_TOKEN;
     if (!token) {
       return res.json({
-        choices: [{
-          message: {
-            role: 'assistant',
-            content: '❌ AI_BUILDER_TOKEN not set. Run: export AI_BUILDER_TOKEN=your_token'
-          }
-        }]
+        choices: [{ message: { role: 'assistant', content: 'AI_BUILDER_TOKEN not set' } }]
       });
     }
 
@@ -32,59 +28,35 @@ app.post('/chat', async (req, res) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({
-        model: model,
-        messages,
-        temperature: 0.7
-      })
+      body: JSON.stringify({ model, messages, temperature: 0.7 })
     });
 
     if (!response.ok) {
-      const error = await response.text();
       return res.json({
-        choices: [{
-          message: {
-            role: 'assistant',
-            content: `❌ API Error ${response.status}: ${error}`
-          }
-        }]
+        choices: [{ message: { role: 'assistant', content: `API Error: ${response.status}` } }]
       });
     }
 
     const data = await response.json();
     res.json(data);
-
   } catch (error) {
     res.json({
-      choices: [{
-        message: {
-          role: 'assistant',
-          content: `❌ Network Error: ${error.message}`
-        }
-      }]
+      choices: [{ message: { role: 'assistant', content: `Error: ${error.message}` } }]
     });
   }
 });
-
 
 // Get available models
 app.get('/models', async (req, res) => {
   try {
     const token = process.env.AI_BUILDER_TOKEN;
-    if (!token) {
-      return res.status(500).json({ error: 'AI_BUILDER_TOKEN not set' });
-    }
+    if (!token) return res.status(500).json({ error: 'AI_BUILDER_TOKEN not set' });
 
     const response = await fetch('https://space.ai-builders.com/backend/v1/models', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
 
-    if (!response.ok) {
-      return res.status(response.status).json({ error: 'Failed to fetch models' });
-    }
-
+    if (!response.ok) return res.status(500).json({ error: 'Failed to fetch models' });
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -96,23 +68,21 @@ app.get('/models', async (req, res) => {
 app.post('/conversations', async (req, res) => {
   try {
     const { id, title, messages, model } = req.body;
-    const filename = `${id}.json`;
-    const filepath = path.join(conversationsDir, filename);
-
     const conversation = {
       id,
       title: title || 'New Chat',
       messages,
-      model: model || 'grok-4-fast',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      model: model, // No hardcoded default - frontend must provide valid model
+      timestamp: new Date().toISOString()
     };
 
-    await fs.writeFile(filepath, JSON.stringify(conversation, null, 2));
-    res.json({ success: true, conversation });
+    await fs.writeFile(
+      path.join(conversationsDir, `${id}.json`),
+      JSON.stringify(conversation, null, 2)
+    );
+    res.json({ success: true });
   } catch (error) {
-    console.error('Error saving conversation:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -125,99 +95,51 @@ app.get('/conversations', async (req, res) => {
     for (const file of files) {
       if (file.endsWith('.json')) {
         try {
-          const filepath = path.join(conversationsDir, file);
-          const data = await fs.readFile(filepath, 'utf8');
-          const conversation = JSON.parse(data);
+          const data = await fs.readFile(path.join(conversationsDir, file), 'utf8');
+          const conv = JSON.parse(data);
           conversations.push({
-            id: conversation.id,
-            title: conversation.title,
-            model: conversation.model,
-            createdAt: conversation.createdAt,
-            updatedAt: conversation.updatedAt,
-            messageCount: conversation.messages.length
+            id: conv.id,
+            title: conv.title,
+            model: conv.model,
+            timestamp: conv.timestamp
           });
-        } catch (error) {
-          console.error(`Error reading ${file}:`, error.message);
-        }
+        } catch (e) { /* skip invalid files */ }
       }
     }
 
-    // Sort by updated date (newest first)
-    conversations.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    conversations.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     res.json(conversations);
   } catch (error) {
-    console.error('Error listing conversations:', error);
-    res.status(500).json({ error: error.message });
+    res.json([]);
   }
 });
 
-// Get specific conversation
+// Load specific conversation
 app.get('/conversations/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const filename = `${id}.json`;
-    const filepath = path.join(conversationsDir, filename);
-
-    const data = await fs.readFile(filepath, 'utf8');
-    const conversation = JSON.parse(data);
-    res.json(conversation);
+    const data = await fs.readFile(path.join(conversationsDir, `${req.params.id}.json`), 'utf8');
+    res.json(JSON.parse(data));
   } catch (error) {
-    console.error('Error loading conversation:', error);
-    res.status(404).json({ error: 'Conversation not found' });
-  }
-});
-
-// Update conversation
-app.put('/conversations/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, messages, model } = req.body;
-    const filename = `${id}.json`;
-    const filepath = path.join(conversationsDir, filename);
-
-    // Read existing conversation
-    const existingData = await fs.readFile(filepath, 'utf8');
-    const existingConversation = JSON.parse(existingData);
-
-    // Update conversation
-    const updatedConversation = {
-      ...existingConversation,
-      title: title || existingConversation.title,
-      messages: messages || existingConversation.messages,
-      model: model || existingConversation.model,
-      updatedAt: new Date().toISOString()
-    };
-
-    await fs.writeFile(filepath, JSON.stringify(updatedConversation, null, 2));
-    res.json({ success: true, conversation: updatedConversation });
-  } catch (error) {
-    console.error('Error updating conversation:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(404).json({ error: 'Not found' });
   }
 });
 
 // Delete conversation
 app.delete('/conversations/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const filename = `${id}.json`;
-    const filepath = path.join(conversationsDir, filename);
-
-    await fs.unlink(filepath);
-    res.json({ success: true, message: 'Conversation deleted' });
+    await fs.unlink(path.join(conversationsDir, `${req.params.id}.json`));
+    res.json({ success: true });
   } catch (error) {
-    console.error('Error deleting conversation:', error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Serve the main chat interface
+// Serve chat interface
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Coco Chat running on port ${PORT}`);
-  console.log(`Access at: http://localhost:${PORT}`);
+const PORT = 3001;
+app.listen(PORT, () => {
+  console.log(`Chat server running at http://localhost:${PORT}`);
 });
