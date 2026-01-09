@@ -10,6 +10,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 const conversationsDir = path.join(__dirname, 'conversations');
 fs.mkdir(conversationsDir, { recursive: true }).catch(console.error);
 
+// Model capabilities for server-side processing
+const modelCapabilities = {
+  'deepseek': ['text'],
+  'gpt-5': ['text', 'vision'],
+  'gpt-image-1.5': ['image_generation'],
+  'grok-4-fast': ['text'],
+  'gemini-2.5-pro': ['text', 'vision'],
+  'gemini-3-flash-preview': ['text', 'vision'],
+  'gemini-2.5-flash-image': ['image_generation'],
+  'supermind-agent-v1': ['text', 'web_search']
+};
+
 // Chat with AI models
 app.post('/chat', async (req, res) => {
   const { messages, model = 'grok-4-fast' } = req.body;
@@ -23,29 +35,10 @@ app.post('/chat', async (req, res) => {
       });
     }
 
-    // Process messages to handle images
+    // Process messages - AI Builder doesn't support images, so strip them out
     const processedMessages = messages.map(msg => {
-      // Only process if image exists AND has actual data
-      if (msg.image && msg.image.data && msg.image.mimeType) {
-        // Convert image data to the format expected by vision models
-        return {
-          role: msg.role,
-          content: [
-            {
-              type: 'text',
-              text: msg.content || 'Please analyze this image:'
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${msg.image.mimeType};base64,${msg.image.data}`
-              }
-            }
-          ]
-        };
-      }
-      // For text-only messages or invalid image data, return as-is but clean up
-      const { image, ...cleanMsg } = msg; // Remove image field from text messages
+      // Always remove image data since AI Builder doesn't support it
+      const { image, ...cleanMsg } = msg;
       return cleanMsg;
     });
 
