@@ -42,23 +42,12 @@ app.post('/chat', async (req, res) => {
     }
 
     // Process messages for personality guard rails
-    const processedMessages = messages.map(msg => {
+    let processedMessages = messages.map(msg => {
       const { image, ...cleanMsg } = msg; // Remove image field
-
-      // Add personality system prompt to the first user message
-      if (msg.role === 'user' && messages.indexOf(msg) === 0) {
-        // Insert system prompt at the beginning
-        processedMessages.unshift({
-          role: 'system',
-          content: personalityGuard.generateSystemPrompt()
-        });
-        return cleanMsg;
-      }
-
       return cleanMsg;
     });
 
-    // Ensure system prompt is present
+    // Ensure system prompt is present at the beginning
     if (processedMessages.length === 0 || processedMessages[0].role !== 'system') {
       processedMessages.unshift({
         role: 'system',

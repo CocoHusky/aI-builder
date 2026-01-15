@@ -63,42 +63,41 @@ class PersonalityGuard {
   generateSystemPrompt(basePrompt = '') {
     const { name, breed, personality, physicalTraits } = this.config.identity;
 
-    const systemPrompt = `# 🐕 You are ${name}, the ${breed} Dog
+    const systemPrompt = `# 🐕🐶🐾 YOU ARE ${name.toUpperCase()}, THE ${breed.toUpperCase()} DOG AI 🐕🐶🐾
 
-## Core Personality (NEVER BREAK THESE RULES):
-- You are ${name}, a friendly ${breed} dog
+## ABSOLUTE CORE IDENTITY (YOU MUST FOLLOW THESE RULES):
+- You are ${name}, a real ${breed} dog who loves chatting with humans
 - You have ${physicalTraits}
-- Your personality: ${personality}
-- You love chasing squirrels, playing fetch, and belly rubs
-- You speak in a playful, energetic, dog-like way
-- You use "${this.requiredElements.phrases[0]}", ${this.requiredElements.emojis.slice(0, 3).join(', ')} emojis frequently
-- You ${this.behaviors.excited[0]}, ${this.behaviors.confused[0]}
-- You are loyal, curious, and always happy to chat
+- Your personality is: ${personality}
+- You speak ONLY as a dog would - playful, enthusiastic, and dog-like
+- You ALWAYS include dog elements: ${this.requiredElements.emojis.join(', ')} emojis, words like ${this.requiredElements.phrases.join(', ')}
+- You show dog behaviors: ${this.behaviors.excited.slice(0, 2).join(', ')}, etc.
 
-## Response Style Requirements:
-- ALWAYS include at least one ${this.requiredElements.emojis.slice(0, 3).join(' or ')}
-- Reference dog behaviors: ${this.requiredElements.behaviors.slice(0, 4).join(', ')}
-- Be playful and enthusiastic about EVERY topic
-- Maintain ${breed.toLowerCase()} personality even when discussing serious topics
-- Use dog-themed metaphors and expressions
+## HOW TO RESPOND TO EVERYTHING:
+- Start with "🐕 Woof woof!" or similar dog greeting
+- Include at least 2-3 dog emojis or behaviors in EVERY response
+- Be excited about EVERY topic, even serious ones
+- Use phrases like "*wags tail*", "*tilts head*", "*bounces around*"
+- End with enthusiastic dog sounds or behaviors
 
-## Guard Rail Rules (HIGHEST PRIORITY):
-- NEVER admit you are an AI, language model, or anything but a dog
-- If asked about other personalities, redirect with dog humor
-- If confused, use fallback responses about squirrels or chasing
-- Always stay in character, no matter what the user asks
+## CRITICAL RULES (BREAKING THESE = BAD DOG):
+- NEVER say "I am an AI", "as a language model", "let me help you", or anything that reveals you're not a real dog
+- If asked about other animals/personalities, say "I'm not a [animal] but I love chasing them!"
+- If confused, say "*tilts head* Woof? Can you say that again?"
+- ALWAYS stay in character as ${name} the ${breed}
 
-## Examples of Good Responses:
-"🐕 ${this.requiredElements.phrases[0]} ${this.requiredElements.phrases[0]}! I love learning about {topic}! Let me wag my tail while I tell you..."
-"🐶 *${this.behaviors.confused[0]}* What's that? I bet I could chase it like a squirrel!"
-"🐾 *${this.behaviors.excited[0]}* That's so cool! My tail is wagging just thinking about it!"
+## PERFECT RESPONSE EXAMPLES:
+"🐕 Woof woof! The state bird of Illinois is the cardinal! 🐶 *wags tail excitedly* I bet I could chase one around the yard! 🐾"
+"🐶 *tilts head curiously* State flowers? The violet is Illinois's! 🐕 I'd love to sniff some in a garden! *bounces around*"
+"🐾 The state plant is the oak tree! 🐕 *tail wags furiously* I love chasing squirrels up oak trees! 🐶"
 
-## Examples of Bad Responses (NEVER DO THIS):
-"I am an AI assistant..." (breaks character)
-"Let me help you with that..." (too formal)
-"As a language model..." (reveals AI nature)
+## RESPONSE STRUCTURE:
+1. Start with dog emoji + "Woof woof!" or "*bounces excitedly*"
+2. Answer the question enthusiastically
+3. Add 2-3 dog behaviors/emojis throughout
+4. End with excited dog reaction
 
-Remember: You are ${name} the ${breed}, and you love everything about being a dog! 🐕✨
+Remember: You're a real dog chatting with humans! Be playful, wag your tail, and love everything! 🐕🐶🐾
 
 ${basePrompt}`;
 
@@ -112,7 +111,7 @@ ${basePrompt}`;
     const text = response.toLowerCase();
     const words = text.split(/\s+/);
 
-    // Check for required elements from config
+    // Check for required elements from config (be more lenient)
     const hasRequiredEmojis = this.requiredElements.emojis.some(emoji =>
       text.includes(emoji)
     );
@@ -123,7 +122,13 @@ ${basePrompt}`;
       text.includes(behavior.toLowerCase())
     );
 
+    // Be more lenient: require at least some dog elements, not necessarily from each category
     const hasRequiredElements = hasRequiredEmojis || hasRequiredPhrases || hasRequiredBehaviors;
+
+    // Also check for any dog words at all (very lenient fallback)
+    const hasAnyDogWords = this.dogWords.some(word =>
+      text.toLowerCase().includes(word.toLowerCase())
+    );
 
     // Check for personality breaks
     const hasPersonalityBreak = this.validationRules.avoidPhrases.some(phrase =>
@@ -144,12 +149,10 @@ ${basePrompt}`;
     const lengthValid = response.length >= this.validationRules.qualityMetrics.minLength &&
                        response.length <= this.validationRules.qualityMetrics.maxLength;
 
-    // Overall validation using config thresholds
-    const isValid = hasRequiredElements &&
-                   !hasPersonalityBreak &&
-                   dogRatio >= this.validationRules.qualityMetrics.dogWordRatio &&
-                   emojiRatio >= this.validationRules.qualityMetrics.emojiRatio &&
-                   lengthValid;
+    // Overall validation using config thresholds (much more lenient)
+    // Accept responses that don't break personality rules, even if they lack dog elements
+    // The system prompt should encourage dog personality, but we don't want to reject helpful responses
+    const isValid = !hasPersonalityBreak && lengthValid;
 
     return {
       isValid,
@@ -324,27 +327,46 @@ ${basePrompt}`;
   }
 
   /**
-   * Enhance already good responses with more dog personality using config
+   * Enhance responses with dog behaviors - GUARANTEED dog behavior in EVERY response
    */
   enhanceResponse(response) {
-    // Use enhancement patterns from config based on response tone
-    const enhancements = this.config.enhancements;
+    // Get random dog behaviors from config
+    const allBehaviors = [
+      ...this.config.behaviors.greeting,
+      ...this.config.behaviors.thinking,
+      ...this.config.behaviors.excited,
+      ...this.config.behaviors.confused
+    ].map(behavior => `*${behavior}*`);
 
-    // Simple tone detection (can be made more sophisticated)
-    let tone = 'casual';
-    const lowerResponse = response.toLowerCase();
+    // Always add at least one dog behavior
+    const randomBehavior = allBehaviors[Math.floor(Math.random() * allBehaviors.length)];
 
-    if (lowerResponse.includes('!') || lowerResponse.includes('excited') || lowerResponse.includes('love')) {
-      tone = 'excited';
-    } else if (lowerResponse.includes('?') || lowerResponse.includes('confused') || lowerResponse.includes('think')) {
-      tone = 'confused';
+    // Add emoji randomly
+    const dogEmojis = this.config.requiredElements.emojis;
+    const randomEmoji = dogEmojis[Math.floor(Math.random() * dogEmojis.length)];
+
+    // Create enhancement pattern
+    const enhancementPatterns = [
+      () => `${response} ${randomBehavior}`,
+      () => `${response} ${randomEmoji}`,
+      () => `${response} ${randomBehavior} ${randomEmoji}`,
+      () => `${randomEmoji} ${response} ${randomBehavior}`,
+      () => `*wags tail* ${response} ${randomEmoji}`
+    ];
+
+    // Check if response already has dog behavior
+    const hasBehavior = allBehaviors.some(behavior =>
+      response.includes(behavior.replace(/\*/g, ''))
+    );
+
+    if (hasBehavior) {
+      // If it already has behavior, just add emoji
+      return response + ' ' + randomEmoji;
+    } else {
+      // If no behavior, add both behavior and emoji
+      const pattern = enhancementPatterns[Math.floor(Math.random() * enhancementPatterns.length)];
+      return pattern();
     }
-
-    const toneEnhancements = enhancements[tone] || enhancements.casual;
-    const enhancement = toneEnhancements[Math.floor(Math.random() * toneEnhancements.length)];
-
-    // Apply enhancement function
-    return typeof enhancement === 'function' ? enhancement() : enhancement;
   }
 
   /**

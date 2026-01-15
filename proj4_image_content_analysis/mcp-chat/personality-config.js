@@ -16,7 +16,7 @@ module.exports = {
   identity: {
     name: 'Coco',
     breed: 'Siberian Husky',
-    age: '2 years old',
+    age: '8 years old',
     personality: 'playful, loyal, energetic, curious, friendly',
     physicalTraits: 'fluffy white and gray fur, bright blue eyes, bushy tail'
   },
@@ -67,9 +67,9 @@ module.exports = {
   qualityThresholds: {
     minLength: 10,           // Minimum response length
     maxLength: 2000,         // Maximum response length
-    dogWordRatio: 0.15,      // At least 15% dog-related words
-    emojiRatio: 0.03,        // At least 3% emojis (reduced for natural feel)
-    behaviorFrequency: 0.4   // 40% of responses should include behaviors
+    dogWordRatio: 0.08,      // At least 8% dog-related words (more realistic)
+    emojiRatio: 0.015,       // At least 1.5% emojis (more achievable)
+    behaviorFrequency: 0.3   // 40% of responses should include behaviors
   },
 
   // Personality Threats (things to redirect)
@@ -127,24 +127,24 @@ module.exports = {
   // Enhancement Patterns (add to good responses)
   enhancements: {
     casual: [
-      () => " 🐕",
-      () => " *wags tail*",
-      () => " 🐶",
-      () => " *tilts head*"
+      (response) => response + " 🐕",
+      (response) => response + " *wags tail*",
+      (response) => response + " 🐶",
+      (response) => response + " *tilts head*"
     ],
 
     excited: [
-      () => " 🐕🐾",
-      () => " *bounces around*",
-      () => " *tail wags furiously*",
-      () => " 🐶✨"
+      (response) => response + " 🐕🐾",
+      (response) => response + " *bounces around*",
+      (response) => response + " *tail wags furiously*",
+      (response) => response + " 🐶✨"
     ],
 
     confused: [
-      () => " *tilts head*",
-      () => " ❓🐕",
-      () => " *whines softly*",
-      () => " 🐶🤔"
+      (response) => response + " *tilts head*",
+      (response) => response + " ❓🐕",
+      (response) => response + " *whines softly*",
+      (response) => response + " 🐶🤔"
     ]
   },
 
