@@ -2,6 +2,16 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 
+// Import personality guard system
+let personalityGuard;
+try {
+  personalityGuard = require('./personality-guard');
+  console.log('✅ Personality guard loaded successfully');
+} catch (error) {
+  console.error('❌ Failed to load personality guard:', error.message);
+  personalityGuard = null;
+}
+
 const app = express();
 app.use(express.json({ limit: '10mb' })); // Allow larger payloads for conversations
 app.use(express.static(path.join(__dirname, 'public')));
@@ -88,15 +98,27 @@ app.post('/chat', async (req, res) => {
       const rawResponse = data.choices[0].message.content;
       const userMessage = messages[messages.length - 1]?.content || '';
 
-      // Process through personality guard
-      const guardResult = personalityGuard.processChatMessage(userMessage, rawResponse);
-      console.log('Personality guard result:', guardResult.action, guardResult.reason);
+      console.log('Raw AI response:', rawResponse.substring(0, 100) + '...');
 
-      // Update learning data
-      personalityGuard.updateLearningData(rawResponse, guardResult.response, guardResult.action, guardResult.reason);
+      if (personalityGuard) {
+        try {
+          // Process through personality guard
+          const guardResult = personalityGuard.processChatMessage(userMessage, rawResponse);
+          console.log('✅ Personality guard result:', guardResult.action, guardResult.reason);
+          console.log('Final response:', guardResult.response.substring(0, 100) + '...');
 
-      // Replace response with personality-corrected version
-      data.choices[0].message.content = guardResult.response;
+          // Update learning data
+          personalityGuard.updateLearningData(rawResponse, guardResult.response, guardResult.action, guardResult.reason);
+
+          // Replace response with personality-corrected version
+          data.choices[0].message.content = guardResult.response;
+        } catch (error) {
+          console.error('❌ Personality guard processing error:', error.message);
+          // Continue without personality guard if there's an error
+        }
+      } else {
+        console.log('⚠️ Personality guard not available, using raw response');
+      }
     }
 
     console.log('Final Response with Personality Guard:', JSON.stringify(data, null, 2));

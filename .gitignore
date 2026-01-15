@@ -1,0 +1,16 @@
+# Coco Chat Application Files
+# These are the main application files kept in repository root
+
+# Python virtual environment
+.venv/
+
+# Node modules (if any in root)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
