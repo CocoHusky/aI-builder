@@ -25,6 +25,9 @@ const modelCapabilities = {
   'supermind-agent-v1': ['text', 'web_search']
 };
 
+// Import personality guard system
+const personalityGuard = require('./personality-guard');
+
 // Chat with AI models
 app.post('/chat', async (req, res) => {
   const { messages, model = 'grok-4-fast' } = req.body;
@@ -38,12 +41,30 @@ app.post('/chat', async (req, res) => {
       });
     }
 
-    // Process messages - AI Builder doesn't support images, so strip them out
+    // Process messages for personality guard rails
     const processedMessages = messages.map(msg => {
-      // Always remove image data since AI Builder doesn't support it
-      const { image, ...cleanMsg } = msg;
+      const { image, ...cleanMsg } = msg; // Remove image field
+
+      // Add personality system prompt to the first user message
+      if (msg.role === 'user' && messages.indexOf(msg) === 0) {
+        // Insert system prompt at the beginning
+        processedMessages.unshift({
+          role: 'system',
+          content: personalityGuard.generateSystemPrompt()
+        });
+        return cleanMsg;
+      }
+
       return cleanMsg;
     });
+
+    // Ensure system prompt is present
+    if (processedMessages.length === 0 || processedMessages[0].role !== 'system') {
+      processedMessages.unshift({
+        role: 'system',
+        content: personalityGuard.generateSystemPrompt()
+      });
+    }
 
     const requestBody = {
       model,
@@ -51,7 +72,7 @@ app.post('/chat', async (req, res) => {
       temperature: 0.7
     };
 
-    console.log('Sending to AI Builder:', JSON.stringify(requestBody, null, 2));
+    console.log('Sending to AI Builder with personality guard:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch('https://space.ai-builders.com/backend/v1/chat/completions', {
       method: 'POST',
@@ -71,7 +92,25 @@ app.post('/chat', async (req, res) => {
     }
 
     const data = await response.json();
-    console.log('AI Builder API Success Response:', JSON.stringify(data, null, 2));
+    console.log('AI Builder API Raw Response:', JSON.stringify(data, null, 2));
+
+    // Apply personality guard rails to the response
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      const rawResponse = data.choices[0].message.content;
+      const userMessage = messages[messages.length - 1]?.content || '';
+
+      // Process through personality guard
+      const guardResult = personalityGuard.processChatMessage(userMessage, rawResponse);
+      console.log('Personality guard result:', guardResult.action, guardResult.reason);
+
+      // Update learning data
+      personalityGuard.updateLearningData(rawResponse, guardResult.response, guardResult.action, guardResult.reason);
+
+      // Replace response with personality-corrected version
+      data.choices[0].message.content = guardResult.response;
+    }
+
+    console.log('Final Response with Personality Guard:', JSON.stringify(data, null, 2));
     res.json(data);
   } catch (error) {
     res.json({
